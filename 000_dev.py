@@ -24,7 +24,10 @@ B0 = 1.5
 
 # r = np.linspace(-0.5 * a, 0.5 * a, 100)
 z = np.linspace(-L*1.3, L*1.3, 1000)
-r = 0 * z +0.01
+x = 0 * z +0.01
+y = 0 * z +0.02
+
+r = np.sqrt(x**2 + y**2)
 
 u = 4 * a * r / (a + r)**2
 zeta_plus = z + L / 2
@@ -62,6 +65,12 @@ Br_minus = B0 / np.pi * sqrt_r_minus * (EE(m_minus) - (1 - m_minus / 2) * KK(m_m
 
 Br = Br_plus - Br_minus
 
+Bx = 0 * z
+By = 0 * z
+
+Bx[mask_r_nonzero] = Br[mask_r_nonzero] * x[mask_r_nonzero] / r[mask_r_nonzero]
+By[mask_r_nonzero] = Br[mask_r_nonzero] * y[mask_r_nonzero] / r[mask_r_nonzero]
+
 
 import matplotlib.pyplot as plt
 plt.close('all')
@@ -71,7 +80,11 @@ plt.plot(z, Bz)
 plt.ylabel('Bz [T]')
 
 ax2 = plt.subplot(2, 1, 2, sharex=ax1)
-plt.plot(z, Br)
+plt.plot(z, Br, label='Br')
+plt.plot(z, Bx, label='Bx')
+plt.plot(z, By, label='By')
 plt.ylabel('Br [T]')
+plt.xlabel('z [m]')
+plt.legend()
 
 plt.show()
