@@ -21,8 +21,8 @@ def ellipp(n, m):
 L = 4
 a = 0.3
 B0 = 1.5
+z0 = 1
 
-# r = np.linspace(-0.5 * a, 0.5 * a, 100)
 z = np.linspace(-L*1.3, L*1.3, 1000)
 x = 0 * z +0.01
 y = 0 * z +0.02
@@ -30,8 +30,8 @@ y = 0 * z +0.02
 r = np.sqrt(x**2 + y**2)
 
 u = 4 * a * r / (a + r)**2
-zeta_plus = z + L / 2
-zeta_minus = z - L / 2
+zeta_plus = z - z0 + L / 2
+zeta_minus = z -z0 - L / 2
 m_plus = 4 * a * r / ((a + r)**2 + zeta_plus**2)
 m_minus = 4 * a * r / ((a + r)**2 + zeta_minus**2)
 
