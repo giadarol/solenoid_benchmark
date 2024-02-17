@@ -125,16 +125,16 @@ z_log = np.array(z_log)
 px_log = np.array(px_log)
 py_log = np.array(py_log)
 
-z_axis = np.linspace(0, 30, 100)
+z_axis = np.linspace(0, 30, 300)
 Bz_axis = sf.get_field(0 * z_axis, 0 * z_axis, z_axis)[2]
 
 P0_J = p.p0c[0] * qe / clight
 brho = P0_J / qe / p.q0
 
-ks = Bz_axis / brho
+ks = 0.5 * (Bz_axis[:-1] + Bz_axis[1:]) / brho
 
 line = xt.Line(elements=[xt.Solenoid(length=z_axis[1]-z_axis[0], ks=ks[ii])
-                            for ii in range(len(z_axis))])
+                            for ii in range(len(z_axis)-1)])
 line.build_tracker()
 
 p_xt = p0.copy()
@@ -144,13 +144,14 @@ mon = line.record_last_track
 import matplotlib.pyplot as plt
 plt.close('all')
 ax1 = plt.subplot(2, 1, 1)
-plt.plot(z_log, x_log)
-plt.plot(mon.s.T, mon.x.T, '.')
+plt.plot(z_log, x_log, label='Boris')
+plt.plot(mon.s.T, mon.x.T, '.', label='xsuite')
+plt.ylabel('x [m]')
+plt.legend()
 
 ax2 = plt.subplot(2, 1, 2, sharex=ax1)
 plt.plot(z_axis, Bz_axis)
-
-
-
+plt.ylabel(r'$B_{z}$ [T]')
+plt.xlabel('z [m]')
 
 plt.show()
