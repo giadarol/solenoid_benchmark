@@ -9,7 +9,7 @@ void boris_step(int64_t N_sub_steps, double Dtt,
 		double* Bx_n_custom, double* By_n_custom, double* Bz_n_custom,
 		int64_t custom_B,
 		int64_t N_mp, int64_t N_multipoles,
-		double charge, double mass)
+		double charge, double* mass_array)
 {
 	int64_t p, isub, order;
 	double Ex_np, Ey_np;
@@ -22,10 +22,11 @@ void boris_step(int64_t N_sub_steps, double Dtt,
 	double vx_plus, vy_plus, vz_plus;
 	double vxn1p, vyn1p, vzn1p;
 	double xn1p, yn1p, zn1p;
-	const double qm=charge/mass;
+
 
 	for(p=0; p<N_mp; p++)
 	{
+        double qm = charge/mass_array[p];
 		Ex_np = Ex_n[p];
 		Ey_np = Ey_n[p];
 
