@@ -18,12 +18,12 @@ def ellipp(n, m):
     rj = elliprj(0, y, 1, 1 - n)
     return rf + rj * n / 3
 
-L = 2.
+L = 10
 a = 0.3
 B0 = 1.5
 
 # r = np.linspace(-0.5 * a, 0.5 * a, 100)
-r = 0.1
+r = 0.001
 z = np.linspace(-L*1.3, L*1.3, 100)
 
 u = 4 * a * r / (a + r)**2
