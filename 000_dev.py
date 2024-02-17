@@ -23,7 +23,7 @@ a = 0.3
 B0 = 1.5
 
 # r = np.linspace(-0.5 * a, 0.5 * a, 100)
-r = 0.001
+r = 0.
 z = np.linspace(-L*1.3, L*1.3, 100)
 
 u = 4 * a * r / (a + r)**2
@@ -32,14 +32,28 @@ zeta_minus = z - L / 2
 m_plus = 4 * a * r / ((a + r)**2 + zeta_plus**2)
 m_minus = 4 * a * r / ((a + r)**2 + zeta_minus**2)
 
+# sqrt_plus = sqrt(m_plus / (a * r))
+sqrt_plus = np.sqrt(4 / ((a + r)**2 + zeta_plus**2))
+
+# sqrt_minus = sqrt(m_minus / (a * r))
+sqrt_minus = np.sqrt(4 / ((a + r)**2 + zeta_minus**2))
+
 KK = scipy.special.ellipk
 EE = scipy.special.ellipe
 PP = ellipp
 
-Bz_plus = B0 * zeta_plus / (4 * np.pi) * np.sqrt(m_plus / (a * r)) * (
+Bz_plus = B0 * zeta_plus / (4 * np.pi) * sqrt_plus * (
                 (KK(m_plus) + (a - r)/(a + r) * PP(u, m_plus)))
 
-Bz_minus = B0 * zeta_minus / (4 * np.pi) * np.sqrt(m_minus / (a * r)) * (
+Bz_minus = B0 * zeta_minus / (4 * np.pi) * sqrt_minus * (
                 (KK(m_minus) + (a - r)/(a + r) * PP(u, m_minus)))
 
 Bz = Bz_plus - Bz_minus
+
+import matplotlib.pyplot as plt
+plt.close('all')
+
+fig, ax = plt.subplots(1, 1)
+plt.plot(z, Bz)
+
+plt.show()
