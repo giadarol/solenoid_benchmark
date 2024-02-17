@@ -1,7 +1,11 @@
 import numpy as np
 from pathlib import Path
 
+from scipy.constants import c as clight
+from scipy.constants import e as qe
+
 import xobjects as xo
+import xtrack as xt
 
 ctx = xo.ContextCpu()
 
@@ -35,3 +39,23 @@ ctx.add_kernels(
     kernels={'boris': boris_knl_description},
     sources=[Path('./boris.h')],
 )
+
+p = xt.Particles(mass0=xt.ELECTRON_MASS_EV, q0=1, energy0=1e9,
+                 x=[-1e-3, 1e-3], px=[1e-3, -1e-3], py=[2e-3, -2e-3])
+
+x = p.x.copy()
+y = p.y.copy()
+z = p.s.copy()
+
+gamma = p.energy / p.mass0
+mass0_kg = p.mass0 * qe / clight**2
+
+p0c_J = p.p0c * qe
+
+Pxc_J = p.px * p0c_J
+Pyc_J = p.py * p0c_J
+Pzc_J = np.sqrt((p0c_J)**2 - Pxc_J**2 - Pyc_J**2)
+
+vx = Pxc_J / clight / (gamma * mass0_kg) # m/s
+vy = Pyc_J / clight / (gamma * mass0_kg) # m/s
+vz = Pzc_J / clight / (gamma * mass0_kg) # m/s
