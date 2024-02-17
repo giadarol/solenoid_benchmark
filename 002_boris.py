@@ -42,15 +42,17 @@ ctx.add_kernels(
     sources=[Path('./boris.h')],
 )
 
-p = xt.Particles(mass0=xt.ELECTRON_MASS_EV, q0=1,
-                #  kinetic_energy0=20e9,
-                 kinetic_energy0=1e8, # to see the spiral
+p0 = xt.Particles(mass0=xt.ELECTRON_MASS_EV, q0=1,
+                 kinetic_energy0=20e9,
+                #  kinetic_energy0=1e8, # to see the spiral
                  x=[-1e-3, 1e-3], px=[1e-6, -1e-6], py=[2e-3, -2e-3])
+
+p = p0.copy()
 
 sf = SolenoidField(L=4, a=0.3, B0=1.5, z0=20)
 
 dt = 1e-10
-n_steps = 10000
+n_steps = 1000
 
 x_log = []
 y_log = []
@@ -123,8 +125,32 @@ z_log = np.array(z_log)
 px_log = np.array(px_log)
 py_log = np.array(py_log)
 
+z_axis = np.linspace(0, 30, 100)
+Bz_axis = sf.get_field(0 * z_axis, 0 * z_axis, z_axis)[2]
+
+P0_J = p.p0c[0] * qe / clight
+brho = P0_J / qe / p.q0
+
+ks = Bz_axis / brho
+
+line = xt.Line(elements=[xt.Solenoid(length=z_axis[1]-z_axis[0], ks=ks[ii])
+                            for ii in range(len(z_axis))])
+line.build_tracker()
+
+p_xt = p0.copy()
+line.track(p_xt, turn_by_turn_monitor='ONE_TURN_EBE')
+mon = line.record_last_track
+
 import matplotlib.pyplot as plt
 plt.close('all')
+ax1 = plt.subplot(2, 1, 1)
 plt.plot(z_log, x_log)
+plt.plot(mon.s.T, mon.x.T, '.')
+
+ax2 = plt.subplot(2, 1, 2, sharex=ax1)
+plt.plot(z_axis, Bz_axis)
+
+
+
 
 plt.show()
