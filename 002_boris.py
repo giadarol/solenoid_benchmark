@@ -141,8 +141,25 @@ p_xt = p0.copy()
 line.track(p_xt, turn_by_turn_monitor='ONE_TURN_EBE')
 mon = line.record_last_track
 
+# Wolsky Eq. 3.114
+Ax = -0.5 * Bz_axis * mon.y
+Ay =  0.5 * Bz_axis * mon.x
+
+# Wolsky Eq. 2.74
+ax = Ax * p0.q0 * qe / P0_J
+ay = Ay * p0.q0 * qe / P0_J
+
+px_mech = mon.px - ax
+py_mech = mon.py - ay
+
+xp = px_mech / (1 + mon.delta)
+yp = py_mech / (1 + mon.delta)
+
+dx_ds = np.diff(mon.x, axis=1) / np.diff(mon.s, axis=1)
+
 import matplotlib.pyplot as plt
 plt.close('all')
+plt.figure(1)
 ax1 = plt.subplot(2, 1, 1)
 plt.plot(z_log, x_log, label='Boris')
 plt.plot(mon.s.T, mon.x.T, '.', label='xsuite')
@@ -153,5 +170,13 @@ ax2 = plt.subplot(2, 1, 2, sharex=ax1)
 plt.plot(z_axis, Bz_axis)
 plt.ylabel(r'$B_{z}$ [T]')
 plt.xlabel('z [m]')
+
+plt.figure(2)
+
+plt.plot(mon.s.T, xp.T, label="x'", color='C0', linestyle='-')
+plt.plot(mon.s[:, :-1].T, dx_ds.T, '.', label=r"$\Delta x / \Delta s$", color='C1')
+plt.plot(mon.s.T, mon.px.T, '--', label=r"$p_x$", color='C2')
+plt.legend()
+
 
 plt.show()
