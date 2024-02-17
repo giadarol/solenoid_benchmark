@@ -42,13 +42,15 @@ ctx.add_kernels(
     sources=[Path('./boris.h')],
 )
 
-p = xt.Particles(mass0=xt.ELECTRON_MASS_EV, q0=1, energy0=1e9,
-                 x=[-1e-3, 1e-3], px=[1e-3, -1e-3], py=[2e-3, -2e-3])
+p = xt.Particles(mass0=xt.ELECTRON_MASS_EV, q0=1,
+                #  kinetic_energy0=20e9,
+                 kinetic_energy0=1e8, # to see the spiral
+                 x=[-1e-3, 1e-3], px=[1e-6, -1e-6], py=[2e-3, -2e-3])
 
-sf = SolenoidField(L=4, a=0.3, B0=1.5, z0=5)
+sf = SolenoidField(L=4, a=0.3, B0=1.5, z0=20)
 
 dt = 1e-10
-n_steps = 100
+n_steps = 10000
 
 x_log = []
 y_log = []
@@ -57,7 +59,6 @@ px_log = []
 py_log = []
 pz_log = []
 
-import pdb; pdb.set_trace()
 
 for ii in range(n_steps):
 
@@ -122,3 +123,8 @@ z_log = np.array(z_log)
 px_log = np.array(px_log)
 py_log = np.array(py_log)
 
+import matplotlib.pyplot as plt
+plt.close('all')
+plt.plot(z_log, x_log)
+
+plt.show()
