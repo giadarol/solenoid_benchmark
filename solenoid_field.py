@@ -79,3 +79,18 @@ class SolenoidField:
 
         return Bx, By, Bz
 
+class Multifield:
+
+    def __init__(self, fields):
+        self.fields = fields
+
+    def get_field(self, x, y, z):
+        Bx = 0 * x
+        By = 0 * x
+        Bz = 0 * x
+        for field in self.fields:
+            Bx_, By_, Bz_ = field.get_field(x, y, z)
+            Bx += Bx_
+            By += By_
+            Bz += Bz_
+        return Bx, By, Bz
