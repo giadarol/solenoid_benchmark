@@ -14,9 +14,12 @@ bz_data_file = './z_fieldmaps/Koratsinos_Bz_closed_before_quads.dat'
 import pandas as pd
 bz_df = pd.read_csv(bz_data_file, sep='\s+', skiprows=1, names=['z', 'Bz'])
 
+l_solenoid = 4.4
 ds_sol_start = -2.2
 ds_sol_end = 2.2
 ip_sol = 'ip.1'
+
+theta_tilt = 15e-3 # rad
 
 s_sol_slices = np.linspace(-2.2, 2.2, 81)
 bz_sol_slices = np.interp(s_sol_slices, bz_df.z, bz_df.Bz)
@@ -39,6 +42,17 @@ line.insert_element(name='sol_start_'+ip_sol, element=xt.Marker(),
 line.insert_element(name='sol_end_'+ip_sol, element=xt.Marker(),
                     at_s=s_ip + ds_sol_end)
 
+sol_start_tilt = xt.YRotation(angle=-theta_tilt * 180 / np.pi)
+sol_end_tilt = xt.YRotation(angle=+theta_tilt * 180 / np.pi)
+sol_start_shift = xt.XYShift(dx=l_solenoid/2 * np.sin(theta_tilt))
+sol_end_shift = xt.XYShift(dx=l_solenoid/2 * np.sin(theta_tilt))
+
+line.element_dict['sol_start_tilt_'+ip_sol] = sol_start_tilt
+line.element_dict['sol_end_tilt_'+ip_sol] = sol_end_tilt
+line.element_dict['sol_start_shift_'+ip_sol] = sol_start_shift
+line.element_dict['sol_end_shift_'+ip_sol] = sol_end_shift
+
+
 sol_slice_names = []
 for ii in range(len(s_sol_slices_entry)):
     nn = f'sol_slice_{ii}_{ip_sol}'
@@ -49,9 +63,13 @@ tt = line.get_table()
 names_upstream = list(tt.rows[:'sol_start_'+ip_sol].name)
 names_downstream = list(tt.rows['sol_end_'+ip_sol:].name[:-1]) # -1 to exclude '_end_point' added by the table
 
-element_names = names_upstream + sol_slice_names + names_downstream
-line.element_names = element_names
+element_names = (names_upstream
+                 + ['sol_start_tilt_'+ip_sol, 'sol_start_shift_'+ip_sol]
+                 + sol_slice_names
+                 + ['sol_end_shift_'+ip_sol, 'sol_end_tilt_'+ip_sol]
+                 + names_downstream)
 
+line.element_names = element_names
 
 # re-insert the ip
 line.element_dict.pop(ip_sol)
