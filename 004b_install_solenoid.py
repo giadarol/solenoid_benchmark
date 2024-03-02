@@ -6,8 +6,6 @@ from scipy.constants import e as qe
 line = xt.Line.from_json('fccee_z_thick.json')
 line.cycle('ip.4', inplace=True)
 
-tw = line.twiss(method='4d')
-
 tt = line.get_table()
 bz_data_file = './z_fieldmaps/Koratsinos_Bz_closed_before_quads.dat'
 
@@ -34,7 +32,7 @@ sol_slices = []
 for ii in range(len(s_sol_slices_entry)):
     sol_slices.append(xt.Solenoid(length=l_sol_slices[ii], ks=0)) # Off for now
 
-s_ip = tw['s', ip_sol]
+s_ip = tt['s', ip_sol]
 
 line.discard_tracker()
 line.insert_element(name='sol_start_'+ip_sol, element=xt.Marker(),
@@ -85,6 +83,13 @@ for ii in range(len(s_sol_slices_entry)):
 tt = line.get_table()
 
 tt.rows['sol_start_ip.1':'sol_end_ip.1'].show()
+
+tw_sol_off = line.twiss(method='4d')
+line.vars['on_sol_ip.1'] = 1
+tw_sol_on = line.twiss(method='4d')
+
+tw_local = line.twiss(start='ip.7', end='ip.2', init_at='ip.1',
+                      init=tw_sol_off)
 
 # plot
 import matplotlib.pyplot as plt
