@@ -117,8 +117,7 @@ opt = line.match(
 )
 opt.solve()
 
-tw_local_corr = line.twiss(start='ip.7', end='ip.2', init_at='ip.1',
-                            init=tw_sol_off)
+
 
 line.vars['ks1.r1'] = 0
 line.vars['ks2.r1'] = 0
@@ -129,6 +128,19 @@ line.element_refs['qc1r1.1'].k1s = line.vars['ks1.r1']
 line.element_refs['qc1r2.1'].k1s = line.vars['ks2.r1']
 line.element_refs['qc1r3.1'].k1s = line.vars['ks3.r1']
 line.element_refs['qc2r1.1'].k1s = line.vars['ks4.r1']
+
+opt = line.match(
+    solve=False,
+    method='4d',
+    start='ip.1',
+    end='ip.2',
+    init=tw_sol_off,
+    vary=xt.VaryList(['ks1.r1', 'ks2.r1', 'ks3.r1', 'ks4.r1'], step=1e-8),
+    targets=xt.TargetSet(alfx2=0, alfy1=0, betx2=0., bety1=0., at=xt.END))
+opt.solve()
+
+tw_local_corr = line.twiss(start='ip.7', end='ip.2', init_at='ip.1',
+                            init=tw_sol_off)
 
 # plot
 import matplotlib.pyplot as plt
@@ -149,6 +161,20 @@ plt.ylabel('x [mm]')
 ax2 = plt.subplot(2, 1, 2, sharex=ax1)
 plt.plot(tw_local.s, tw_local.y*1e3, label='y')
 plt.plot(tw_local_corr.s, tw_local_corr.y*1e3, label='y corr')
+
+plt.xlabel('s [m]')
+plt.ylabel('y [mm]')
+
+plt.figure(3)
+ax1 = plt.subplot(2, 1, 1)
+plt.plot(tw_local.s, tw_local.betx2, label='x')
+plt.plot(tw_local_corr.s, tw_local_corr.betx2, label='x corr')
+plt.ylabel(r'$\beta_{x,2}$ [m]')
+
+ax2 = plt.subplot(2, 1, 2, sharex=ax1)
+plt.plot(tw_local.s, tw_local.bety1, label='y')
+plt.plot(tw_local_corr.s, tw_local_corr.bety1, label='y corr')
+plt.ylabel(r'$\beta_{y,1}$ [m]')
 
 plt.xlabel('s [m]')
 plt.ylabel('y [mm]')
