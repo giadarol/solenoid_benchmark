@@ -78,14 +78,28 @@ line.insert_element(name='mcb1.r1', element=xt.Multipole(knl=[0]),
                     at='qc1r1.1_entry')
 line.insert_element(name='mcb2.r1', element=xt.Multipole(knl=[0]),
                     at='qc1r1.1_exit')
+line.insert_element(name='mcb1.l1', element=xt.Multipole(knl=[0]),
+                    at='qc1l1.4_exit')
+line.insert_element(name='mcb2.l1', element=xt.Multipole(knl=[0]),
+                    at='qc1l1.4_entry')
+
 line.vars['acb1h.r1'] = 0
 line.vars['acb1v.r1'] = 0
 line.vars['acb2h.r1'] = 0
 line.vars['acb2v.r1'] = 0
+line.vars['acb1h.l1'] = 0
+line.vars['acb1v.l1'] = 0
+line.vars['acb2h.l1'] = 0
+line.vars['acb2v.l1'] = 0
+
 line.element_refs['mcb1.r1'].knl[0] = line.vars['acb1h.r1']
 line.element_refs['mcb2.r1'].knl[0] = line.vars['acb2h.r1']
 line.element_refs['mcb1.r1'].ksl[0] = line.vars['acb1v.r1']
 line.element_refs['mcb2.r1'].ksl[0] = line.vars['acb2v.r1']
+line.element_refs['mcb1.l1'].knl[0] = line.vars['acb1h.l1']
+line.element_refs['mcb2.l1'].knl[0] = line.vars['acb2h.l1']
+line.element_refs['mcb1.l1'].ksl[0] = line.vars['acb1v.l1']
+line.element_refs['mcb2.l1'].ksl[0] = line.vars['acb2v.l1']
 
 line.build_tracker()
 
@@ -109,34 +123,57 @@ tw_local = line.twiss(start='ip.7', end='ip.2', init_at='ip.1',
 opt = line.match(
     solve=False,
     method='4d',
-    start='ip.1',
+    start='ip.7',
     end='ip.2',
+    init_at='ip.1',
     init=tw_sol_off,
-    vary=xt.VaryList(['acb1h.r1', 'acb2h.r1','acb1v.r1', 'acb2v.r1'], step=1e-8),
-    targets=xt.TargetSet(x=0, px=0, y=0, py=0, at=xt.END)
+    vary=[
+        xt.VaryList(['acb1h.r1', 'acb2h.r1','acb1v.r1', 'acb2v.r1'], step=1e-8),
+        xt.VaryList(['acb1h.l1', 'acb2h.l1','acb1v.l1', 'acb2v.l1'], step=1e-8),
+    ],
+    targets=[
+        xt.TargetSet(x=0, px=0, y=0, py=0, at=xt.START),
+        xt.TargetSet(x=0, px=0, y=0, py=0, at=xt.END)
+    ]
 )
 opt.solve()
 
-
+prrrr
 
 line.vars['ks1.r1'] = 0
 line.vars['ks2.r1'] = 0
 line.vars['ks3.r1'] = 0
 line.vars['ks4.r1'] = 0
+line.vars['ks1.l1'] = 0
+line.vars['ks2.l1'] = 0
+line.vars['ks3.l1'] = 0
+line.vars['ks4.l1'] = 0
 
 line.element_refs['qc1r1.1'].k1s = line.vars['ks1.r1']
 line.element_refs['qc1r2.1'].k1s = line.vars['ks2.r1']
 line.element_refs['qc1r3.1'].k1s = line.vars['ks3.r1']
 line.element_refs['qc2r1.1'].k1s = line.vars['ks4.r1']
+line.element_refs['qc1l1.4'].k1s = line.vars['ks1.l1']
+line.element_refs['qc1l2.4'].k1s = line.vars['ks2.l1']
+line.element_refs['qc1l3.4'].k1s = line.vars['ks3.l1']
+line.element_refs['qc2l1.4'].k1s = line.vars['ks4.l1']
 
 opt = line.match(
     solve=False,
     method='4d',
-    start='ip.1',
-    end='ip.2',
+    start='pqc2le.4',
+    end='pqc2re.1',
     init=tw_sol_off,
-    vary=xt.VaryList(['ks1.r1', 'ks2.r1', 'ks3.r1', 'ks4.r1'], step=1e-8),
-    targets=xt.TargetSet(alfx2=0, alfy1=0, betx2=0., bety1=0., at=xt.END))
+    init_at='ip.1',
+    vary=[
+        xt.VaryList(['ks1.r1', 'ks2.r1', 'ks3.r1', 'ks4.r1'], step=1e-8),
+        # xt.VaryList(['ks1.l1', 'ks2.l1', 'ks3.l1', 'ks4.l1'], step=1e-7),
+    ],
+    targets=[
+        # xt.TargetSet(alfx2=0, alfy1=0, betx2=0., bety1=0., at=xt.START, tol=1e-9),
+        xt.TargetSet(alfx2=0, alfy1=0, betx2=0., bety1=0., at=xt.END, tol=1e-9),
+    ]
+)
 opt.solve()
 
 tw_local_corr = line.twiss(start='ip.7', end='ip.2', init_at='ip.1',
