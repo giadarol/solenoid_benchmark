@@ -138,8 +138,6 @@ opt = line.match(
 )
 opt.solve()
 
-prrrr
-
 line.vars['ks1.r1'] = 0
 line.vars['ks2.r1'] = 0
 line.vars['ks3.r1'] = 0
@@ -149,14 +147,16 @@ line.vars['ks2.l1'] = 0
 line.vars['ks3.l1'] = 0
 line.vars['ks4.l1'] = 0
 
-line.element_refs['qc1r1.1'].k1s = line.vars['ks1.r1']
+# line.element_refs['qc1r1.1'].k1s = line.vars['ks1.r1']
 line.element_refs['qc1r2.1'].k1s = line.vars['ks2.r1']
 line.element_refs['qc1r3.1'].k1s = line.vars['ks3.r1']
 line.element_refs['qc2r1.1'].k1s = line.vars['ks4.r1']
-line.element_refs['qc1l1.4'].k1s = line.vars['ks1.l1']
+line.element_refs['qc2r2.1'].k1s = line.vars['ks4.r1']
+# line.element_refs['qc1l1.4'].k1s = line.vars['ks1.l1']
 line.element_refs['qc1l2.4'].k1s = line.vars['ks2.l1']
 line.element_refs['qc1l3.4'].k1s = line.vars['ks3.l1']
 line.element_refs['qc2l1.4'].k1s = line.vars['ks4.l1']
+line.element_refs['qc2l2.4'].k1s = line.vars['ks4.l1']
 
 opt = line.match(
     solve=False,
@@ -167,14 +167,14 @@ opt = line.match(
     init_at='ip.1',
     vary=[
         xt.VaryList(['ks1.r1', 'ks2.r1', 'ks3.r1', 'ks4.r1'], step=1e-8),
-        # xt.VaryList(['ks1.l1', 'ks2.l1', 'ks3.l1', 'ks4.l1'], step=1e-7),
+        xt.VaryList(['ks1.l1', 'ks2.l1', 'ks3.l1', 'ks4.l1'], step=1e-8),
     ],
     targets=[
-        # xt.TargetSet(alfx2=0, alfy1=0, betx2=0., bety1=0., at=xt.START, tol=1e-9),
-        xt.TargetSet(alfx2=0, alfy1=0, betx2=0., bety1=0., at=xt.END, tol=1e-9),
+        xt.TargetSet(alfx2=0, alfy1=0, betx2=0., bety1=0., at=xt.START, tol=5e-10),
+        xt.TargetSet(alfx2=0, alfy1=0, betx2=0., bety1=0., at=xt.END, tol=5e-10),
     ]
 )
-opt.solve()
+opt.step(25)
 
 tw_local_corr = line.twiss(start='ip.7', end='ip.2', init_at='ip.1',
                             init=tw_sol_off)
