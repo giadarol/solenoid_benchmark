@@ -112,9 +112,13 @@ opt = line.match(
     start='ip.1',
     end='ip.2',
     init=tw_sol_off,
-    vary=xt.VaryList(['acb1h.l1', 'acb2h.l1','acb1v.l1', 'acb2v.l1'], step=1e-6),
+    vary=xt.VaryList(['acb1h.l1', 'acb2h.l1','acb1v.l1', 'acb2v.l1'], step=1e-8),
     targets=xt.TargetSet(x=0, px=0, y=0, py=0, at=xt.END)
 )
+opt.solve()
+
+tw_local_corr = line.twiss(start='ip.7', end='ip.2', init_at='ip.1',
+                            init=tw_sol_off)
 
 # plot
 import matplotlib.pyplot as plt
@@ -127,8 +131,13 @@ plt.ylabel('Bz [T]')
 plt.grid()
 
 plt.figure(2)
+ax1 = plt.subplot(2, 1, 1)
 plt.plot(tw_local.s, tw_local.x*1e3, label='x')
+plt.plot(tw_local_corr.s, tw_local_corr.x*1e3, label='x corr')
+
+ax2 = plt.subplot(2, 1, 2, sharex=ax1)
 plt.plot(tw_local.s, tw_local.y*1e3, label='y')
+plt.plot(tw_local_corr.s, tw_local_corr.y*1e3, label='y corr')
 
 plt.xlabel('s [m]')
 plt.ylabel('x, y [mm]')
