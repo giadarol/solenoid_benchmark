@@ -74,18 +74,18 @@ line.element_dict.pop(ip_sol)
 line.insert_element(name=ip_sol, element=xt.Marker(), at_s=s_ip)
 
 # Add dipole correctors
-line.insert_element(name='mcb1.l1', element=xt.Multipole(knl=[0]),
+line.insert_element(name='mcb1.r1', element=xt.Multipole(knl=[0]),
                     at='qc1r1.1_entry')
-line.insert_element(name='mcb2.l1', element=xt.Multipole(knl=[0]),
+line.insert_element(name='mcb2.r1', element=xt.Multipole(knl=[0]),
                     at='qc1r1.1_exit')
-line.vars['acb1h.l1'] = 0
-line.vars['acb1v.l1'] = 0
-line.vars['acb2h.l1'] = 0
-line.vars['acb2v.l1'] = 0
-line.element_refs['mcb1.l1'].knl[0] = line.vars['acb1h.l1']
-line.element_refs['mcb2.l1'].knl[0] = line.vars['acb2h.l1']
-line.element_refs['mcb1.l1'].ksl[0] = line.vars['acb1v.l1']
-line.element_refs['mcb2.l1'].ksl[0] = line.vars['acb2v.l1']
+line.vars['acb1h.r1'] = 0
+line.vars['acb1v.r1'] = 0
+line.vars['acb2h.r1'] = 0
+line.vars['acb2v.r1'] = 0
+line.element_refs['mcb1.r1'].knl[0] = line.vars['acb1h.r1']
+line.element_refs['mcb2.r1'].knl[0] = line.vars['acb2h.r1']
+line.element_refs['mcb1.r1'].ksl[0] = line.vars['acb1v.r1']
+line.element_refs['mcb2.r1'].ksl[0] = line.vars['acb2v.r1']
 
 line.build_tracker()
 
@@ -112,13 +112,23 @@ opt = line.match(
     start='ip.1',
     end='ip.2',
     init=tw_sol_off,
-    vary=xt.VaryList(['acb1h.l1', 'acb2h.l1','acb1v.l1', 'acb2v.l1'], step=1e-8),
+    vary=xt.VaryList(['acb1h.r1', 'acb2h.r1','acb1v.r1', 'acb2v.r1'], step=1e-8),
     targets=xt.TargetSet(x=0, px=0, y=0, py=0, at=xt.END)
 )
 opt.solve()
 
 tw_local_corr = line.twiss(start='ip.7', end='ip.2', init_at='ip.1',
                             init=tw_sol_off)
+
+line.vars['ks1.r1'] = 0
+line.vars['ks2.r1'] = 0
+line.vars['ks3.r1'] = 0
+line.vars['ks4.r1'] = 0
+
+line.element_refs['qc1r1.1'].k1s = line.vars['ks1.r1']
+line.element_refs['qc1r2.1'].k1s = line.vars['ks2.r1']
+line.element_refs['qc1r3.1'].k1s = line.vars['ks3.r1']
+line.element_refs['qc2r1.1'].k1s = line.vars['ks4.r1']
 
 # plot
 import matplotlib.pyplot as plt
@@ -134,12 +144,13 @@ plt.figure(2)
 ax1 = plt.subplot(2, 1, 1)
 plt.plot(tw_local.s, tw_local.x*1e3, label='x')
 plt.plot(tw_local_corr.s, tw_local_corr.x*1e3, label='x corr')
+plt.ylabel('x [mm]')
 
 ax2 = plt.subplot(2, 1, 2, sharex=ax1)
 plt.plot(tw_local.s, tw_local.y*1e3, label='y')
 plt.plot(tw_local_corr.s, tw_local_corr.y*1e3, label='y corr')
 
 plt.xlabel('s [m]')
-plt.ylabel('x, y [mm]')
+plt.ylabel('y [mm]')
 
 plt.show()
