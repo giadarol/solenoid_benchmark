@@ -167,7 +167,7 @@ line.element_refs['qc2l1.4'].k1 += line.vars['corr_k1.l1']
 line.element_refs['qc2l2.4'].k1 += line.vars['corr_k2.l1']
 line.element_refs['qc1l2.4'].k1 += line.vars['corr_k3.l1']
 
-opt = line.match(
+opt_l = line.match(
     solve=False,
     method='4d',
     start='pqc2le.4',
@@ -180,14 +180,14 @@ opt = line.match(
     ],
     targets=[
 
-        xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[2, 0], 0, tol=1e-8, tag='coupl_ip'),
-        xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[2, 1], 0, tol=1e-8, tag='coupl_ip'),
-        xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[3, 0], 0, tol=1e-8, tag='coupl_ip'),
-        xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[3, 1], 0, tol=1e-8, tag='coupl_ip'),
-        xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[0, 2], 0, tol=1e-8, tag='coupl_ip'),
-        xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[0, 3], 0, tol=1e-8, tag='coupl_ip'),
-        xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[1, 2], 0, tol=1e-8, tag='coupl_ip'),
-        xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[1, 3], 0, tol=1e-8, tag='coupl_ip'),
+        xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[2, 0], 0, tol=1e-8, tag='coupl'),
+        xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[2, 1], 0, tol=1e-8, tag='coupl'),
+        xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[3, 0], 0, tol=1e-8, tag='coupl'),
+        xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[3, 1], 0, tol=1e-8, tag='coupl'),
+        xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[0, 2], 0, tol=1e-8, tag='coupl'),
+        xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[0, 3], 0, tol=1e-8, tag='coupl'),
+        xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[1, 2], 0, tol=1e-8, tag='coupl'),
+        xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[1, 3], 0, tol=1e-8, tag='coupl'),
 
         xt.Target('mux', value=tw_sol_off, at='ip.1', tag='mu_ip', weight=0.1, tol=1e-6),
         xt.Target('muy', value=tw_sol_off, at='ip.1', tag='mu_ip', weight=0.1, tol=1e-6),
@@ -199,25 +199,25 @@ opt = line.match(
     ]
 )
 
-opt.disable_all_targets()
-opt.disable_all_vary()
+opt_l.disable_all_targets()
+opt_l.disable_all_vary()
 
 # Coupling left side
-opt.enable_targets(tag='coupl_ip')
-opt.enable_vary(tag='skew_l')
-opt.step(25)
+opt_l.enable_targets(tag='coupl')
+opt_l.enable_vary(tag='skew_l')
+opt_l.step(25)
 
-opt.enable_targets(tag='mu_ip')
-opt.enable_vary(tag='normal_l')
-opt.step(25)
+opt_l.enable_targets(tag='mu_ip')
+opt_l.enable_vary(tag='normal_l')
+opt_l.step(25)
 
-opt.enable_targets(tag='bet_ip')
-opt.enable_vary(tag='normal_l')
-opt.step(25)
+opt_l.enable_targets(tag='bet_ip')
+opt_l.enable_vary(tag='normal_l')
+opt_l.step(25)
 
-opt.enable_targets(tag='alf_ip')
-opt.enable_vary(tag='normal_l')
-opt.step(25)
+opt_l.enable_targets(tag='alf_ip')
+opt_l.enable_vary(tag='normal_l')
+opt_l.step(25)
 
 
 opt_r = line.match(
