@@ -175,10 +175,13 @@ opt_l = line.match(
     init=tw_sol_off,
     init_at=xt.START,
     vary=[
+        xt.VaryList(['acb1h.l1', 'acb2h.l1','acb1v.l1', 'acb2v.l1'], step=1e-8, tag='corr_l'),
         xt.VaryList(['ks1.l1', 'ks2.l1', 'ks3.l1', 'ks0.l1'], step=1e-7, tag='skew_l'),
         xt.VaryList(['corr_k1.l1', 'corr_k2.l1', 'corr_k3.l1', 'corr_k0.l1'], step=1e-6, tag='normal_l'),
     ],
     targets=[
+
+        xt.TargetSet(['x', 'px', 'y', 'py'], value=tw_sol_off, at='ip.1', tag='orbit'),
 
         xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[2, 0], 0, tol=1e-8, tag='coupl'),
         xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[2, 1], 0, tol=1e-8, tag='coupl'),
@@ -193,18 +196,26 @@ opt_l = line.match(
         xt.Target('muy', value=tw_sol_off, at='ip.1', tag='mu_ip', weight=0.1, tol=1e-6),
         xt.Target('betx', value=tw_sol_off, at='ip.1', tag='bet_ip', weight=1, tol=1e-5),
         xt.Target('bety', value=tw_sol_off, at='ip.1', tag='bet_ip', weight=10, tol=1e-7),
-        xt.Target('alfx', value=tw_sol_off, at='ip.1', tag='alf_ip', weight=0.1, tol=1e-5),
-        xt.Target('alfy', value=tw_sol_off, at='ip.1', tag='alf_ip', weight=0.1, tol=1e-5),
+        xt.Target('alfx', value=tw_sol_off, at='ip.1', tag='alf_ip', weight=0.1, tol=1e-4),
+        xt.Target('alfy', value=tw_sol_off, at='ip.1', tag='alf_ip', weight=0.1, tol=1e-4),
 
     ]
 )
 
 opt_l.disable_all_targets()
 opt_l.disable_all_vary()
+opt_l.enable_targets(tag='orbit')
+opt_l.enable_vary(tag='corr_l')
+opt_l.step(25)
 
-# Coupling left side
+opt_l.disable_all_targets()
+opt_l.disable_all_vary()
 opt_l.enable_targets(tag='coupl')
 opt_l.enable_vary(tag='skew_l')
+opt_l.step(25)
+
+opt_l.enable_targets(tag='orbit')
+opt_l.enable_vary(tag='corr_l')
 opt_l.step(25)
 
 opt_l.enable_targets(tag='mu_ip')
@@ -220,6 +231,7 @@ opt_l.enable_vary(tag='normal_l')
 opt_l.step(25)
 
 
+
 opt_r = line.match(
     solve=False,
     method='4d',
@@ -228,10 +240,13 @@ opt_r = line.match(
     init=tw_sol_off,
     init_at=xt.END,
     vary=[
+        xt.VaryList(['acb1h.r1', 'acb2h.r1','acb1v.r1', 'acb2v.r1'], step=1e-8, tag='corr_r'),
         xt.VaryList(['ks1.r1', 'ks2.r1', 'ks3.r1', 'ks0.r1'], step=1e-7, tag='skew_r'),
         xt.VaryList(['corr_k1.r1', 'corr_k2.r1', 'corr_k3.r1', 'corr_k0.r1'], step=1e-6, tag='normal_r'),
     ],
     targets=[
+
+        xt.TargetSet(['x', 'px', 'y', 'py'], value=tw_sol_off, at='ip.1', tag='orbit'),
 
         xt.TargetRmatTerm('r31', start='ip.1', end='pqc2re.1', value=0, tol=1e-8, tag='coupl'),
         # xt.Target(lambda tw: tw.get_R_matrix('ip.1', 'pqc2re.1')[2, 0], 0, tol=1e-8, tag='coupl'),
@@ -247,19 +262,26 @@ opt_r = line.match(
         xt.Target('muy', value=tw_sol_off, at='ip.1', tag='mu_ip', weight=0.1, tol=1e-6),
         xt.Target('betx', value=tw_sol_off, at='ip.1', tag='bet_ip', weight=1, tol=1e-5),
         xt.Target('bety', value=tw_sol_off, at='ip.1', tag='bet_ip', weight=10, tol=1e-7),
-        xt.Target('alfx', value=tw_sol_off, at='ip.1', tag='alf_ip', weight=0.1, tol=1e-5),
-        xt.Target('alfy', value=tw_sol_off, at='ip.1', tag='alf_ip', weight=0.1, tol=1e-5),
+        xt.Target('alfx', value=tw_sol_off, at='ip.1', tag='alf_ip', weight=0.1, tol=1e-4),
+        xt.Target('alfy', value=tw_sol_off, at='ip.1', tag='alf_ip', weight=0.1, tol=1e-4),
 
     ]
 )
 
+opt_r.disable_all_targets()
+opt_r.disable_all_vary()
+opt_r.enable_targets(tag='orbit')
+opt_r.enable_vary(tag='corr_r')
+opt_r.step(25)
 
 opt_r.disable_all_targets()
 opt_r.disable_all_vary()
-
-# Coupling left side
 opt_r.enable_targets(tag='coupl')
 opt_r.enable_vary(tag='skew_r')
+opt_r.step(25)
+
+opt_r.enable_targets(tag='orbit')
+opt_r.enable_vary(tag='corr_r')
 opt_r.step(25)
 
 opt_r.enable_targets(tag='mu_ip')
@@ -273,25 +295,6 @@ opt_r.step(25)
 opt_r.enable_targets(tag='alf_ip')
 opt_r.enable_vary(tag='normal_r')
 opt_r.step(25)
-
-
-opt_orbit = line.match(
-    solve=False,
-    method='4d',
-    start='ip.7',
-    end='ip.2',
-    init_at='ip.1',
-    init=tw_sol_off,
-    vary=[
-        xt.VaryList(['acb1h.r1', 'acb2h.r1','acb1v.r1', 'acb2v.r1'], step=1e-8),
-        xt.VaryList(['acb1h.l1', 'acb2h.l1','acb1v.l1', 'acb2v.l1'], step=1e-8),
-    ],
-    targets=[
-        xt.TargetSet(x=0, px=0, y=0, py=0, at=xt.START),
-        xt.TargetSet(x=0, px=0, y=0, py=0, at=xt.END)
-    ]
-)
-opt_orbit.solve()
 
 tw_local_corr = line.twiss(start='ip.4', end='_end_point', init_at='ip.4',
                             init=tw_sol_off)
