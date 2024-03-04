@@ -139,13 +139,11 @@ line.element_refs['qc1r1.1'].k1s = line.vars['ks0.r1']
 line.element_refs['qc2r1.1'].k1s = line.vars['ks1.r1']
 line.element_refs['qc2r2.1'].k1s = line.vars['ks2.r1']
 line.element_refs['qc1r2.1'].k1s = line.vars['ks3.r1']
-# line.element_refs['qc1r3.1'].k1s = line.vars['ks4.r1']
 
 line.element_refs['qc1l1.4'].k1s = line.vars['ks0.l1']
 line.element_refs['qc2l1.4'].k1s = line.vars['ks1.l1']
 line.element_refs['qc2l2.4'].k1s = line.vars['ks2.l1']
 line.element_refs['qc1l2.4'].k1s = line.vars['ks3.l1']
-# line.element_refs['qc1l3.4'].k1s = line.vars['ks4.l1']
 
 line.vars['corr_k0.r1'] = 0
 line.vars['corr_k1.r1'] = 0
@@ -183,14 +181,14 @@ opt_l = line.match(
 
         xt.TargetSet(['x', 'px', 'y', 'py'], value=tw_sol_off, at='ip.1', tag='orbit'),
 
-        xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[2, 0], 0, tol=1e-8, tag='coupl'),
-        xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[2, 1], 0, tol=1e-8, tag='coupl'),
-        xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[3, 0], 0, tol=1e-8, tag='coupl'),
-        xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[3, 1], 0, tol=1e-8, tag='coupl'),
-        xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[0, 2], 0, tol=1e-8, tag='coupl'),
-        xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[0, 3], 0, tol=1e-8, tag='coupl'),
-        xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[1, 2], 0, tol=1e-8, tag='coupl'),
-        xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[1, 3], 0, tol=1e-8, tag='coupl'),
+        xt.TargetRmatrixTerm('r31', start='pqc2le.4', end='ip.1', value=0, tol=1e-8, tag='coupl'),
+        xt.TargetRmatrixTerm('r32', start='pqc2le.4', end='ip.1', value=0, tol=1e-8, tag='coupl'),
+        xt.TargetRmatrixTerm('r41', start='pqc2le.4', end='ip.1', value=0, tol=1e-8, tag='coupl'),
+        xt.TargetRmatrixTerm('r42', start='pqc2le.4', end='ip.1', value=0, tol=1e-8, tag='coupl'),
+        xt.TargetRmatrixTerm('r13', start='pqc2le.4', end='ip.1', value=0, tol=1e-8, tag='coupl'),
+        xt.TargetRmatrixTerm('r14', start='pqc2le.4', end='ip.1', value=0, tol=1e-8, tag='coupl'),
+        xt.TargetRmatrixTerm('r23', start='pqc2le.4', end='ip.1', value=0, tol=1e-8, tag='coupl'),
+        xt.TargetRmatrixTerm('r24', start='pqc2le.4', end='ip.1', value=0, tol=1e-8, tag='coupl'),
 
         xt.Target('mux', value=tw_sol_off, at='ip.1', tag='mu_ip', weight=0.1, tol=1e-6),
         xt.Target('muy', value=tw_sol_off, at='ip.1', tag='mu_ip', weight=0.1, tol=1e-6),
@@ -223,11 +221,9 @@ opt_l.enable_vary(tag='normal_l')
 opt_l.step(25)
 
 opt_l.enable_targets(tag='bet_ip')
-opt_l.enable_vary(tag='normal_l')
 opt_l.step(25)
 
 opt_l.enable_targets(tag='alf_ip')
-opt_l.enable_vary(tag='normal_l')
 opt_l.step(25)
 
 
@@ -248,15 +244,14 @@ opt_r = line.match(
 
         xt.TargetSet(['x', 'px', 'y', 'py'], value=tw_sol_off, at='ip.1', tag='orbit'),
 
-        xt.TargetRmatTerm('r31', start='ip.1', end='pqc2re.1', value=0, tol=1e-8, tag='coupl'),
-        # xt.Target(lambda tw: tw.get_R_matrix('ip.1', 'pqc2re.1')[2, 0], 0, tol=1e-8, tag='coupl'),
-        xt.Target(lambda tw: tw.get_R_matrix('ip.1', 'pqc2re.1')[2, 1], 0, tol=1e-8, tag='coupl'),
-        xt.Target(lambda tw: tw.get_R_matrix('ip.1', 'pqc2re.1')[3, 0], 0, tol=1e-8, tag='coupl'),
-        xt.Target(lambda tw: tw.get_R_matrix('ip.1', 'pqc2re.1')[3, 1], 0, tol=1e-8, tag='coupl'),
-        xt.Target(lambda tw: tw.get_R_matrix('ip.1', 'pqc2re.1')[0, 2], 0, tol=1e-8, tag='coupl'),
-        xt.Target(lambda tw: tw.get_R_matrix('ip.1', 'pqc2re.1')[0, 3], 0, tol=1e-8, tag='coupl'),
-        xt.Target(lambda tw: tw.get_R_matrix('ip.1', 'pqc2re.1')[1, 2], 0, tol=1e-8, tag='coupl'),
-        xt.Target(lambda tw: tw.get_R_matrix('ip.1', 'pqc2re.1')[1, 3], 0, tol=1e-8, tag='coupl'),
+        xt.TargetRmatrixTerm('r31', start='ip.1', end='pqc2re.1', value=0, tol=1e-8, tag='coupl'),
+        xt.TargetRmatrixTerm('r32', start='ip.1', end='pqc2re.1', value=0, tol=1e-8, tag='coupl'),
+        xt.TargetRmatrixTerm('r41', start='ip.1', end='pqc2re.1', value=0, tol=1e-8, tag='coupl'),
+        xt.TargetRmatrixTerm('r42', start='ip.1', end='pqc2re.1', value=0, tol=1e-8, tag='coupl'),
+        xt.TargetRmatrixTerm('r13', start='ip.1', end='pqc2re.1', value=0, tol=1e-8, tag='coupl'),
+        xt.TargetRmatrixTerm('r14', start='ip.1', end='pqc2re.1', value=0, tol=1e-8, tag='coupl'),
+        xt.TargetRmatrixTerm('r23', start='ip.1', end='pqc2re.1', value=0, tol=1e-8, tag='coupl'),
+        xt.TargetRmatrixTerm('r24', start='ip.1', end='pqc2re.1', value=0, tol=1e-8, tag='coupl'),
 
         xt.Target('mux', value=tw_sol_off, at='ip.1', tag='mu_ip', weight=0.1, tol=1e-6),
         xt.Target('muy', value=tw_sol_off, at='ip.1', tag='mu_ip', weight=0.1, tol=1e-6),
@@ -289,11 +284,9 @@ opt_r.enable_vary(tag='normal_r')
 opt_r.step(25)
 
 opt_r.enable_targets(tag='bet_ip')
-opt_r.enable_vary(tag='normal_r')
 opt_r.step(25)
 
 opt_r.enable_targets(tag='alf_ip')
-opt_r.enable_vary(tag='normal_r')
 opt_r.step(25)
 
 tw_local_corr = line.twiss(start='ip.4', end='_end_point', init_at='ip.4',
