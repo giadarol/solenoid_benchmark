@@ -170,14 +170,16 @@ opt = line.match(
         xt.VaryList(['ks1.l1', 'ks2.l1', 'ks3.l1', 'ks4.l1'], step=1e-8),
     ],
     targets=[
-        xt.TargetSet(alfx2=0, alfy1=0, betx2=0., bety1=0., at=xt.START, tol=5e-10),
-        xt.TargetSet(alfx2=0, alfy1=0, betx2=0., bety1=0., at=xt.END, tol=5e-10),
+        xt.TargetSet(gamx2=0, gamy1=0, betx2=0., bety1=0., at=xt.START, tol=5e-10),
+        xt.TargetSet(gamx2=0, gamy1=0, betx2=0., bety1=0., at=xt.END, tol=5e-10),
     ]
 )
 opt.step(25)
 
-tw_local_corr = line.twiss(start='ip.7', end='ip.2', init_at='ip.1',
+tw_local_corr = line.twiss(start='ip.7', end='ip.2', init_at='ip.7',
                             init=tw_sol_off)
+
+twinit = tw_local_corr.get_twiss_init('ip.7')
 
 # plot
 import matplotlib.pyplot as plt
@@ -214,6 +216,21 @@ plt.plot(tw_local_corr.s, tw_local_corr.bety1, label='y corr')
 plt.ylabel(r'$\beta_{y,1}$ [m]')
 
 plt.xlabel('s [m]')
-plt.ylabel('y [mm]')
+
+
+plt.figure(3)
+ax1 = plt.subplot(2, 1, 1)
+plt.plot(tw_local.s, tw_local.gamx2, label='x')
+plt.plot(tw_local_corr.s, tw_local_corr.betx2, label='x corr')
+plt.ylabel(r'$\beta_{x,2}$ [m]')
+
+ax2 = plt.subplot(2, 1, 2, sharex=ax1)
+plt.plot(tw_local.s, tw_local.gamy1, label='y')
+plt.plot(tw_local_corr.s, tw_local_corr.bety1, label='y corr')
+plt.ylabel(r'$\beta_{y,1}$ [m]')
+
+plt.xlabel('s [m]')
+
+
 
 plt.show()
