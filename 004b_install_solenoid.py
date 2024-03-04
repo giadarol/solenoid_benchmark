@@ -232,10 +232,6 @@ opt.enable_targets(tag='mu_ip')
 opt.enable_vary(tag='normal_l')
 opt.step(25)
 
-opt.enable_targets(tag='coupl_ip')
-opt.enable_vary(tag='skew_l')
-opt.step(25)
-
 opt.enable_targets(tag='bet_ip')
 opt.enable_vary(tag='normal_l')
 opt.step(25)
