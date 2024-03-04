@@ -138,26 +138,28 @@ opt = line.match(
 )
 opt.solve()
 
+line.vars['ks0.r1'] = 0
 line.vars['ks1.r1'] = 0
 line.vars['ks2.r1'] = 0
 line.vars['ks3.r1'] = 0
 line.vars['ks4.r1'] = 0
+line.vars['ks0.l1'] = 0
 line.vars['ks1.l1'] = 0
 line.vars['ks2.l1'] = 0
 line.vars['ks3.l1'] = 0
 line.vars['ks4.l1'] = 0
 
-# line.element_refs['qc1r1.1'].k1s = line.vars['ks1.r1']
+line.element_refs['qc1r1.1'].k1s = line.vars['ks0.r1']
 line.element_refs['qc2r1.1'].k1s = line.vars['ks1.r1']
 line.element_refs['qc2r2.1'].k1s = line.vars['ks2.r1']
 line.element_refs['qc1r2.1'].k1s = line.vars['ks3.r1']
-line.element_refs['qc1r3.1'].k1s = line.vars['ks4.r1']
+# line.element_refs['qc1r3.1'].k1s = line.vars['ks4.r1']
 
-# line.element_refs['qc1l1.4'].k1s = line.vars['ks1.l1']
+line.element_refs['qc1l1.4'].k1s = line.vars['ks0.l1']
 line.element_refs['qc2l1.4'].k1s = line.vars['ks1.l1']
 line.element_refs['qc2l2.4'].k1s = line.vars['ks2.l1']
 line.element_refs['qc1l2.4'].k1s = line.vars['ks3.l1']
-line.element_refs['qc1l3.4'].k1s = line.vars['ks4.l1']
+# line.element_refs['qc1l3.4'].k1s = line.vars['ks4.l1']
 
 
 opt = line.match(
@@ -168,28 +170,40 @@ opt = line.match(
     init=tw_sol_off,
     init_at='ip.7',
     vary=[
-        xt.VaryList(['ks1.l1', 'ks2.l1', 'ks3.l1', 'ks4.l1'], step=1e-6),
-        xt.VaryList(['ks1.r1', 'ks2.r1', 'ks3.r1', 'ks4.r1'], step=1e-6),
+        # xt.VaryList(['ks1.l1', 'ks2.l1', 'ks3.l1', 'ks4.l1'], step=1e-6),
+        # xt.VaryList(['ks1.r1', 'ks2.r1', 'ks3.r1', 'ks4.r1'], step=1e-6),
+        xt.VaryList(['ks1.l1', 'ks2.l1', 'ks3.l1', 'ks0.l1'], step=1e-6),
+        xt.VaryList(['ks1.r1', 'ks2.r1', 'ks3.r1', 'ks0.r1'], step=1e-6),
     ],
     targets=[
         # xt.TargetSet(gamx2=0, gamy1=0, betx2=0., bety1=0., at=xt.START, tol=5e-10),
         # xt.TargetSet(gamx2=0, gamy1=0, betx2=0., bety1=0., at=xt.END, tol=5e-10),
-        xt.Target(lambda tw: tw['W_matrix', 'ip.2'][2, 0], 0, tol=5e-9),
-        xt.Target(lambda tw: tw['W_matrix', 'ip.2'][2, 1], 0, tol=5e-9),
-        xt.Target(lambda tw: tw['W_matrix', 'ip.2'][3, 0], 0, tol=5e-9),
-        xt.Target(lambda tw: tw['W_matrix', 'ip.2'][3, 1], 0, tol=5e-9),
-        xt.Target(lambda tw: tw['W_matrix', 'ip.2'][0, 2], 0, tol=5e-9),
-        xt.Target(lambda tw: tw['W_matrix', 'ip.2'][0, 3], 0, tol=5e-9),
-        xt.Target(lambda tw: tw['W_matrix', 'ip.2'][1, 2], 0, tol=5e-9),
-        xt.Target(lambda tw: tw['W_matrix', 'ip.2'][1, 3], 0, tol=5e-9),
+
+        # xt.Target(lambda tw: tw['W_matrix', 'ip.2'][2, 0], 0, tol=5e-9),
+        # xt.Target(lambda tw: tw['W_matrix', 'ip.2'][2, 1], 0, tol=5e-9),
+        # xt.Target(lambda tw: tw['W_matrix', 'ip.2'][3, 0], 0, tol=5e-9),
+        # xt.Target(lambda tw: tw['W_matrix', 'ip.2'][3, 1], 0, tol=5e-9),
+        # xt.Target(lambda tw: tw['W_matrix', 'ip.2'][0, 2], 0, tol=5e-9),
+        # xt.Target(lambda tw: tw['W_matrix', 'ip.2'][0, 3], 0, tol=5e-9),
+        # xt.Target(lambda tw: tw['W_matrix', 'ip.2'][1, 2], 0, tol=5e-9),
+        # xt.Target(lambda tw: tw['W_matrix', 'ip.2'][1, 3], 0, tol=5e-9),
+
+        xt.Target(lambda tw: tw.get_R_matrix('ip.7', 'ip.2')[2, 0], 0, tol=1e-8),
+        xt.Target(lambda tw: tw.get_R_matrix('ip.7', 'ip.2')[2, 1], 0, tol=1e-8),
+        xt.Target(lambda tw: tw.get_R_matrix('ip.7', 'ip.2')[3, 0], 0, tol=1e-8),
+        xt.Target(lambda tw: tw.get_R_matrix('ip.7', 'ip.2')[3, 1], 0, tol=1e-8),
+        xt.Target(lambda tw: tw.get_R_matrix('ip.7', 'ip.2')[0, 2], 0, tol=1e-8),
+        xt.Target(lambda tw: tw.get_R_matrix('ip.7', 'ip.2')[0, 3], 0, tol=1e-8),
+        xt.Target(lambda tw: tw.get_R_matrix('ip.7', 'ip.2')[1, 2], 0, tol=1e-8),
+        xt.Target(lambda tw: tw.get_R_matrix('ip.7', 'ip.2')[1, 3], 0, tol=1e-8),
     ]
 )
 opt.step(25)
 
-tw_local_corr = line.twiss(start='ip.7', end='ip.2', init_at='ip.7',
+tw_local_corr = line.twiss(start='ip.4', end='_end_point', init_at='ip.4',
                             init=tw_sol_off)
 
-tw_local_corr_back = line.twiss(start='ip.7', end='ip.2', init_at='ip.2',
+tw_local_corr_back = line.twiss(start='ip.4', end='_end_point', init_at='ip.4',
                                 init=tw_local_corr)
 
 
