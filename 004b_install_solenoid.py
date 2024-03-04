@@ -233,7 +233,8 @@ opt_r = line.match(
     ],
     targets=[
 
-        xt.Target(lambda tw: tw.get_R_matrix('ip.1', 'pqc2re.1')[2, 0], 0, tol=1e-8, tag='coupl'),
+        xt.TargetRmatTerm('r31', start='ip.1', end='pqc2re.1', value=0, tol=1e-8, tag='coupl'),
+        # xt.Target(lambda tw: tw.get_R_matrix('ip.1', 'pqc2re.1')[2, 0], 0, tol=1e-8, tag='coupl'),
         xt.Target(lambda tw: tw.get_R_matrix('ip.1', 'pqc2re.1')[2, 1], 0, tol=1e-8, tag='coupl'),
         xt.Target(lambda tw: tw.get_R_matrix('ip.1', 'pqc2re.1')[3, 0], 0, tol=1e-8, tag='coupl'),
         xt.Target(lambda tw: tw.get_R_matrix('ip.1', 'pqc2re.1')[3, 1], 0, tol=1e-8, tag='coupl'),
