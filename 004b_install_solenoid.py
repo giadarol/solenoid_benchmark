@@ -148,30 +148,38 @@ line.vars['ks3.l1'] = 0
 line.vars['ks4.l1'] = 0
 
 # line.element_refs['qc1r1.1'].k1s = line.vars['ks1.r1']
+line.element_refs['qc2r2.1'].k1s = line.vars['ks1.r1']
 line.element_refs['qc1r2.1'].k1s = line.vars['ks2.r1']
 line.element_refs['qc1r3.1'].k1s = line.vars['ks3.r1']
 line.element_refs['qc2r1.1'].k1s = line.vars['ks4.r1']
-line.element_refs['qc2r2.1'].k1s = line.vars['ks4.r1']
 # line.element_refs['qc1l1.4'].k1s = line.vars['ks1.l1']
+line.element_refs['qc2l2.4'].k1s = line.vars['ks1.l1']
 line.element_refs['qc1l2.4'].k1s = line.vars['ks2.l1']
 line.element_refs['qc1l3.4'].k1s = line.vars['ks3.l1']
 line.element_refs['qc2l1.4'].k1s = line.vars['ks4.l1']
-line.element_refs['qc2l2.4'].k1s = line.vars['ks4.l1']
 
 opt = line.match(
     solve=False,
     method='4d',
-    start='pqc2le.4',
-    end='pqc2re.1',
+    start='ip.7',
+    end='ip.2',
     init=tw_sol_off,
-    init_at='ip.1',
+    init_at='ip.7',
     vary=[
-        xt.VaryList(['ks1.r1', 'ks2.r1', 'ks3.r1', 'ks4.r1'], step=1e-8),
-        xt.VaryList(['ks1.l1', 'ks2.l1', 'ks3.l1', 'ks4.l1'], step=1e-8),
+        xt.VaryList(['ks1.l1', 'ks2.l1', 'ks3.l1', 'ks4.l1'], step=1e-6),
+        xt.VaryList(['ks1.r1', 'ks2.r1', 'ks3.r1', 'ks4.r1'], step=1e-6),
     ],
     targets=[
-        xt.TargetSet(gamx2=0, gamy1=0, betx2=0., bety1=0., at=xt.START, tol=5e-10),
-        xt.TargetSet(gamx2=0, gamy1=0, betx2=0., bety1=0., at=xt.END, tol=5e-10),
+        # xt.TargetSet(gamx2=0, gamy1=0, betx2=0., bety1=0., at=xt.START, tol=5e-10),
+        # xt.TargetSet(gamx2=0, gamy1=0, betx2=0., bety1=0., at=xt.END, tol=5e-10),
+        xt.Target(lambda tw: tw['W_matrix', 'ip.2'][2, 0], 0, tol=5e-10),
+        xt.Target(lambda tw: tw['W_matrix', 'ip.2'][2, 1], 0, tol=5e-10),
+        xt.Target(lambda tw: tw['W_matrix', 'ip.2'][3, 0], 0, tol=5e-10),
+        xt.Target(lambda tw: tw['W_matrix', 'ip.2'][3, 1], 0, tol=5e-10),
+        xt.Target(lambda tw: tw['W_matrix', 'ip.2'][0, 2], 0, tol=5e-10),
+        xt.Target(lambda tw: tw['W_matrix', 'ip.2'][0, 3], 0, tol=5e-10),
+        xt.Target(lambda tw: tw['W_matrix', 'ip.2'][1, 2], 0, tol=5e-10),
+        xt.Target(lambda tw: tw['W_matrix', 'ip.2'][1, 3], 0, tol=5e-10),
     ]
 )
 opt.step(25)
@@ -179,7 +187,11 @@ opt.step(25)
 tw_local_corr = line.twiss(start='ip.7', end='ip.2', init_at='ip.7',
                             init=tw_sol_off)
 
-twinit = tw_local_corr.get_twiss_init('ip.7')
+tw_local_corr_back = line.twiss(start='ip.7', end='ip.2', init_at='ip.2',
+                                init=tw_local_corr)
+
+
+
 
 # plot
 import matplotlib.pyplot as plt
@@ -206,28 +218,32 @@ plt.ylabel('y [mm]')
 
 plt.figure(3)
 ax1 = plt.subplot(2, 1, 1)
-plt.plot(tw_local.s, tw_local.betx2, label='x')
-plt.plot(tw_local_corr.s, tw_local_corr.betx2, label='x corr')
+plt.plot(tw_local.s, tw_local.betx2)
+plt.plot(tw_local_corr.s, tw_local_corr.betx2)
+plt.plot(tw_local_corr_back.s, tw_local_corr_back.betx2)
 plt.ylabel(r'$\beta_{x,2}$ [m]')
 
 ax2 = plt.subplot(2, 1, 2, sharex=ax1)
-plt.plot(tw_local.s, tw_local.bety1, label='y')
-plt.plot(tw_local_corr.s, tw_local_corr.bety1, label='y corr')
+plt.plot(tw_local.s, tw_local.bety1)
+plt.plot(tw_local_corr.s, tw_local_corr.bety1)
+plt.plot(tw_local_corr_back.s, tw_local_corr_back.bety1)
 plt.ylabel(r'$\beta_{y,1}$ [m]')
 
 plt.xlabel('s [m]')
 
 
-plt.figure(3)
-ax1 = plt.subplot(2, 1, 1)
-plt.plot(tw_local.s, tw_local.gamx2, label='x')
-plt.plot(tw_local_corr.s, tw_local_corr.betx2, label='x corr')
-plt.ylabel(r'$\beta_{x,2}$ [m]')
+plt.figure(4)
+ax1 = plt.subplot(2, 1, 1, sharex=ax1)
+plt.plot(tw_local.s, tw_local.gamx2)
+plt.plot(tw_local_corr.s, tw_local_corr.gamx2)
+plt.plot(tw_local_corr_back.s, tw_local_corr_back.gamx2)
+plt.ylabel(r'$\gamma_{x,2}$ [m]')
 
 ax2 = plt.subplot(2, 1, 2, sharex=ax1)
-plt.plot(tw_local.s, tw_local.gamy1, label='y')
-plt.plot(tw_local_corr.s, tw_local_corr.bety1, label='y corr')
-plt.ylabel(r'$\beta_{y,1}$ [m]')
+plt.plot(tw_local.s, tw_local.gamy1)
+plt.plot(tw_local_corr.s, tw_local_corr.gamy1)
+plt.plot(tw_local_corr_back.s, tw_local_corr_back.gamy1)
+plt.ylabel(r'$\gamma_{y,1}$ [m]')
 
 plt.xlabel('s [m]')
 
