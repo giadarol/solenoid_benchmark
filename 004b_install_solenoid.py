@@ -355,6 +355,20 @@ plt.ylabel(r'$\gamma_{y,1}$ [m]')
 
 plt.xlabel('s [m]')
 
+tw_sol_on_corrected = line.twiss(method='4d')
+
+plt.figure(5)
+ax1 = plt.subplot(2, 1, 1)
+plt.plot(tw_sol_off.s, tw_sol_on.betx2, label='betx2 off')
+plt.plot(tw_sol_off.s, tw_sol_on_corrected.betx2, label='betx2 on')
+plt.ylabel(r'$\beta_{x,2}$ [m]')
+plt.legend()
+
+ax2 = plt.subplot(2, 1, 2, sharex=ax1)
+plt.plot(tw_sol_off.s, tw_sol_on.bety1, label='bety1 off')
+plt.plot(tw_sol_off.s, tw_sol_on_corrected.bety1, label='bety1 on')
+plt.ylabel(r'$\beta_{y,1}$ [m]')
+
 
 
 plt.show()
