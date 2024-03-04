@@ -9,6 +9,8 @@ line.cycle('ip.4', inplace=True)
 tt = line.get_table()
 bz_data_file = './z_fieldmaps/Koratsinos_Bz_closed_before_quads.dat'
 
+line.vars['voltca1'] = 0
+
 import pandas as pd
 bz_df = pd.read_csv(bz_data_file, sep='\s+', skiprows=1, names=['z', 'Bz'])
 
@@ -120,23 +122,7 @@ tw_sol_on = line.twiss(method='4d')
 tw_local = line.twiss(start='ip.7', end='ip.2', init_at='ip.1',
                       init=tw_sol_off)
 
-opt = line.match(
-    solve=False,
-    method='4d',
-    start='ip.7',
-    end='ip.2',
-    init_at='ip.1',
-    init=tw_sol_off,
-    vary=[
-        xt.VaryList(['acb1h.r1', 'acb2h.r1','acb1v.r1', 'acb2v.r1'], step=1e-8),
-        xt.VaryList(['acb1h.l1', 'acb2h.l1','acb1v.l1', 'acb2v.l1'], step=1e-8),
-    ],
-    targets=[
-        xt.TargetSet(x=0, px=0, y=0, py=0, at=xt.START),
-        xt.TargetSet(x=0, px=0, y=0, py=0, at=xt.END)
-    ]
-)
-opt.solve()
+
 
 line.vars['ks0.r1'] = 0
 line.vars['ks1.r1'] = 0
@@ -165,15 +151,15 @@ line.element_refs['qc1l2.4'].k1s = line.vars['ks3.l1']
 opt = line.match(
     solve=False,
     method='4d',
-    start='ip.7',
-    end='ip.2',
+    start='pqc2le.4',
+    end='pqc2re.1',
     init=tw_sol_off,
-    init_at='ip.7',
+    init_at=xt.START,
     vary=[
         # xt.VaryList(['ks1.l1', 'ks2.l1', 'ks3.l1', 'ks4.l1'], step=1e-6),
         # xt.VaryList(['ks1.r1', 'ks2.r1', 'ks3.r1', 'ks4.r1'], step=1e-6),
-        xt.VaryList(['ks1.l1', 'ks2.l1', 'ks3.l1', 'ks0.l1'], step=1e-6),
-        xt.VaryList(['ks1.r1', 'ks2.r1', 'ks3.r1', 'ks0.r1'], step=1e-6),
+        xt.VaryList(['ks1.l1', 'ks2.l1', 'ks3.l1', 'ks0.l1'], step=1e-7),
+        xt.VaryList(['ks1.r1', 'ks2.r1', 'ks3.r1', 'ks0.r1'], step=1e-7),
     ],
     targets=[
         # xt.TargetSet(gamx2=0, gamy1=0, betx2=0., bety1=0., at=xt.START, tol=5e-10),
@@ -188,17 +174,52 @@ opt = line.match(
         # xt.Target(lambda tw: tw['W_matrix', 'ip.2'][1, 2], 0, tol=5e-9),
         # xt.Target(lambda tw: tw['W_matrix', 'ip.2'][1, 3], 0, tol=5e-9),
 
-        xt.Target(lambda tw: tw.get_R_matrix('ip.7', 'ip.2')[2, 0], 0, tol=1e-8),
-        xt.Target(lambda tw: tw.get_R_matrix('ip.7', 'ip.2')[2, 1], 0, tol=1e-8),
-        xt.Target(lambda tw: tw.get_R_matrix('ip.7', 'ip.2')[3, 0], 0, tol=1e-8),
-        xt.Target(lambda tw: tw.get_R_matrix('ip.7', 'ip.2')[3, 1], 0, tol=1e-8),
-        xt.Target(lambda tw: tw.get_R_matrix('ip.7', 'ip.2')[0, 2], 0, tol=1e-8),
-        xt.Target(lambda tw: tw.get_R_matrix('ip.7', 'ip.2')[0, 3], 0, tol=1e-8),
-        xt.Target(lambda tw: tw.get_R_matrix('ip.7', 'ip.2')[1, 2], 0, tol=1e-8),
-        xt.Target(lambda tw: tw.get_R_matrix('ip.7', 'ip.2')[1, 3], 0, tol=1e-8),
+        # xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'pqc2re.1')[2, 0], 0, tol=1e-8),
+        # xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'pqc2re.1')[2, 1], 0, tol=1e-8),
+        # xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'pqc2re.1')[3, 0], 0, tol=1e-8),
+        # xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'pqc2re.1')[3, 1], 0, tol=1e-8),
+        # xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'pqc2re.1')[0, 2], 0, tol=1e-8),
+        # xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'pqc2re.1')[0, 3], 0, tol=1e-8),
+        # xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'pqc2re.1')[1, 2], 0, tol=1e-8),
+        # xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'pqc2re.1')[1, 3], 0, tol=1e-8),
+
+        xt.Target(lambda tw: tw.get_R_matrix('ip.1', 'pqc2re.1')[2, 0], 0, tol=1e-8),
+        xt.Target(lambda tw: tw.get_R_matrix('ip.1', 'pqc2re.1')[2, 1], 0, tol=1e-8),
+        xt.Target(lambda tw: tw.get_R_matrix('ip.1', 'pqc2re.1')[3, 0], 0, tol=1e-8),
+        xt.Target(lambda tw: tw.get_R_matrix('ip.1', 'pqc2re.1')[3, 1], 0, tol=1e-8),
+        xt.Target(lambda tw: tw.get_R_matrix('ip.1', 'pqc2re.1')[0, 2], 0, tol=1e-8),
+        xt.Target(lambda tw: tw.get_R_matrix('ip.1', 'pqc2re.1')[0, 3], 0, tol=1e-8),
+        xt.Target(lambda tw: tw.get_R_matrix('ip.1', 'pqc2re.1')[1, 2], 0, tol=1e-8),
+        xt.Target(lambda tw: tw.get_R_matrix('ip.1', 'pqc2re.1')[1, 3], 0, tol=1e-8),
+        xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[2, 0], 0, tol=1e-8),
+        xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[2, 1], 0, tol=1e-8),
+        xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[3, 0], 0, tol=1e-8),
+        xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[3, 1], 0, tol=1e-8),
+        xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[0, 2], 0, tol=1e-8),
+        xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[0, 3], 0, tol=1e-8),
+        xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[1, 2], 0, tol=1e-8),
+        xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[1, 3], 0, tol=1e-8),
     ]
 )
 opt.step(25)
+
+opt_orbit = line.match(
+    solve=False,
+    method='4d',
+    start='ip.7',
+    end='ip.2',
+    init_at='ip.1',
+    init=tw_sol_off,
+    vary=[
+        xt.VaryList(['acb1h.r1', 'acb2h.r1','acb1v.r1', 'acb2v.r1'], step=1e-8),
+        xt.VaryList(['acb1h.l1', 'acb2h.l1','acb1v.l1', 'acb2v.l1'], step=1e-8),
+    ],
+    targets=[
+        xt.TargetSet(x=0, px=0, y=0, py=0, at=xt.START),
+        xt.TargetSet(x=0, px=0, y=0, py=0, at=xt.END)
+    ]
+)
+opt_orbit.solve()
 
 tw_local_corr = line.twiss(start='ip.4', end='_end_point', init_at='ip.4',
                             init=tw_sol_off)
