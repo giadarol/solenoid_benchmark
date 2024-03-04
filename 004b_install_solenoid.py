@@ -147,6 +147,25 @@ line.element_refs['qc2l2.4'].k1s = line.vars['ks2.l1']
 line.element_refs['qc1l2.4'].k1s = line.vars['ks3.l1']
 # line.element_refs['qc1l3.4'].k1s = line.vars['ks4.l1']
 
+line.vars['corr_k0.r1'] = 0
+line.vars['corr_k1.r1'] = 0
+line.vars['corr_k2.r1'] = 0
+line.vars['corr_k3.r1'] = 0
+line.vars['corr_k4.r1'] = 0
+line.vars['corr_k0.l1'] = 0
+line.vars['corr_k1.l1'] = 0
+line.vars['corr_k2.l1'] = 0
+line.vars['corr_k3.l1'] = 0
+line.vars['corr_k4.l1'] = 0
+
+line.element_refs['qc1r1.1'].k1 += line.vars['corr_k0.r1']
+line.element_refs['qc2r1.1'].k1 += line.vars['corr_k1.r1']
+line.element_refs['qc2r2.1'].k1 += line.vars['corr_k2.r1']
+line.element_refs['qc1r2.1'].k1 += line.vars['corr_k3.r1']
+line.element_refs['qc1l1.4'].k1 += line.vars['corr_k0.l1']
+line.element_refs['qc2l1.4'].k1 += line.vars['corr_k1.l1']
+line.element_refs['qc2l2.4'].k1 += line.vars['corr_k2.l1']
+line.element_refs['qc1l2.4'].k1 += line.vars['corr_k3.l1']
 
 opt = line.match(
     solve=False,
@@ -158,50 +177,94 @@ opt = line.match(
     vary=[
         # xt.VaryList(['ks1.l1', 'ks2.l1', 'ks3.l1', 'ks4.l1'], step=1e-6),
         # xt.VaryList(['ks1.r1', 'ks2.r1', 'ks3.r1', 'ks4.r1'], step=1e-6),
-        xt.VaryList(['ks1.l1', 'ks2.l1', 'ks3.l1', 'ks0.l1'], step=1e-7),
-        xt.VaryList(['ks1.r1', 'ks2.r1', 'ks3.r1', 'ks0.r1'], step=1e-7),
+        xt.VaryList(['ks1.l1', 'ks2.l1', 'ks3.l1', 'ks0.l1'], step=1e-7, tag='skew_l'),
+        # xt.VaryList(['ks1.r1', 'ks2.r1', 'ks3.r1', 'ks0.r1'], step=1e-7, tag='skew_r'),
+        xt.VaryList(['corr_k1.l1', 'corr_k2.l1', 'corr_k3.l1', 'corr_k0.l1'], step=1e-6, tag='normal_l'),
+        # xt.VaryList(['corr_k1.r1', 'corr_k2.r1', 'corr_k3.r1', 'corr_k0.r1'], step=1e-6, tag='normal_r'),
     ],
     targets=[
-        # xt.TargetSet(gamx2=0, gamy1=0, betx2=0., bety1=0., at=xt.START, tol=5e-10),
-        # xt.TargetSet(gamx2=0, gamy1=0, betx2=0., bety1=0., at=xt.END, tol=5e-10),
 
-        # xt.Target(lambda tw: tw['W_matrix', 'ip.2'][2, 0], 0, tol=5e-9),
-        # xt.Target(lambda tw: tw['W_matrix', 'ip.2'][2, 1], 0, tol=5e-9),
-        # xt.Target(lambda tw: tw['W_matrix', 'ip.2'][3, 0], 0, tol=5e-9),
-        # xt.Target(lambda tw: tw['W_matrix', 'ip.2'][3, 1], 0, tol=5e-9),
-        # xt.Target(lambda tw: tw['W_matrix', 'ip.2'][0, 2], 0, tol=5e-9),
-        # xt.Target(lambda tw: tw['W_matrix', 'ip.2'][0, 3], 0, tol=5e-9),
-        # xt.Target(lambda tw: tw['W_matrix', 'ip.2'][1, 2], 0, tol=5e-9),
-        # xt.Target(lambda tw: tw['W_matrix', 'ip.2'][1, 3], 0, tol=5e-9),
+        xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[2, 0], 0, tol=1e-8, tag='coupl_ip'),
+        xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[2, 1], 0, tol=1e-8, tag='coupl_ip'),
+        xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[3, 0], 0, tol=1e-8, tag='coupl_ip'),
+        xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[3, 1], 0, tol=1e-8, tag='coupl_ip'),
+        xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[0, 2], 0, tol=1e-8, tag='coupl_ip'),
+        xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[0, 3], 0, tol=1e-8, tag='coupl_ip'),
+        xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[1, 2], 0, tol=1e-8, tag='coupl_ip'),
+        xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[1, 3], 0, tol=1e-8, tag='coupl_ip'),
 
-        # xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'pqc2re.1')[2, 0], 0, tol=1e-8),
-        # xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'pqc2re.1')[2, 1], 0, tol=1e-8),
-        # xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'pqc2re.1')[3, 0], 0, tol=1e-8),
-        # xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'pqc2re.1')[3, 1], 0, tol=1e-8),
-        # xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'pqc2re.1')[0, 2], 0, tol=1e-8),
-        # xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'pqc2re.1')[0, 3], 0, tol=1e-8),
-        # xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'pqc2re.1')[1, 2], 0, tol=1e-8),
-        # xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'pqc2re.1')[1, 3], 0, tol=1e-8),
+        # xt.Target(lambda tw: tw.get_R_matrix('ip.1', 'pqc2re.1')[2, 0], 0, tol=1e-8, tag='coupl_end'),
+        # xt.Target(lambda tw: tw.get_R_matrix('ip.1', 'pqc2re.1')[2, 1], 0, tol=1e-8, tag='coupl_end'),
+        # xt.Target(lambda tw: tw.get_R_matrix('ip.1', 'pqc2re.1')[3, 0], 0, tol=1e-8, tag='coupl_end'),
+        # xt.Target(lambda tw: tw.get_R_matrix('ip.1', 'pqc2re.1')[3, 1], 0, tol=1e-8, tag='coupl_end'),
+        # xt.Target(lambda tw: tw.get_R_matrix('ip.1', 'pqc2re.1')[0, 2], 0, tol=1e-8, tag='coupl_end'),
+        # xt.Target(lambda tw: tw.get_R_matrix('ip.1', 'pqc2re.1')[0, 3], 0, tol=1e-8, tag='coupl_end'),
+        # xt.Target(lambda tw: tw.get_R_matrix('ip.1', 'pqc2re.1')[1, 2], 0, tol=1e-8, tag='coupl_end'),
+        # xt.Target(lambda tw: tw.get_R_matrix('ip.1', 'pqc2re.1')[1, 3], 0, tol=1e-8, tag='coupl_end'),
 
-        xt.Target(lambda tw: tw.get_R_matrix('ip.1', 'pqc2re.1')[2, 0], 0, tol=1e-8),
-        xt.Target(lambda tw: tw.get_R_matrix('ip.1', 'pqc2re.1')[2, 1], 0, tol=1e-8),
-        xt.Target(lambda tw: tw.get_R_matrix('ip.1', 'pqc2re.1')[3, 0], 0, tol=1e-8),
-        xt.Target(lambda tw: tw.get_R_matrix('ip.1', 'pqc2re.1')[3, 1], 0, tol=1e-8),
-        xt.Target(lambda tw: tw.get_R_matrix('ip.1', 'pqc2re.1')[0, 2], 0, tol=1e-8),
-        xt.Target(lambda tw: tw.get_R_matrix('ip.1', 'pqc2re.1')[0, 3], 0, tol=1e-8),
-        xt.Target(lambda tw: tw.get_R_matrix('ip.1', 'pqc2re.1')[1, 2], 0, tol=1e-8),
-        xt.Target(lambda tw: tw.get_R_matrix('ip.1', 'pqc2re.1')[1, 3], 0, tol=1e-8),
-        xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[2, 0], 0, tol=1e-8),
-        xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[2, 1], 0, tol=1e-8),
-        xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[3, 0], 0, tol=1e-8),
-        xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[3, 1], 0, tol=1e-8),
-        xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[0, 2], 0, tol=1e-8),
-        xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[0, 3], 0, tol=1e-8),
-        xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[1, 2], 0, tol=1e-8),
-        xt.Target(lambda tw: tw.get_R_matrix('pqc2le.4', 'ip.1')[1, 3], 0, tol=1e-8),
+        xt.Target('mux', value=tw_sol_off, at='ip.1', tag='mu_ip', weight=0.1, tol=1e-6),
+        xt.Target('muy', value=tw_sol_off, at='ip.1', tag='mu_ip', weight=0.1, tol=1e-6),
+        xt.Target('betx', value=tw_sol_off, at='ip.1', tag='bet_ip', weight=1, tol=1e-5),
+        xt.Target('bety', value=tw_sol_off, at='ip.1', tag='bet_ip', weight=10, tol=1e-7),
+        xt.Target('alfx', value=tw_sol_off, at='ip.1', tag='alf_ip', weight=0.1, tol=1e-5),
+        xt.Target('alfy', value=tw_sol_off, at='ip.1', tag='alf_ip', weight=0.1, tol=1e-5),
+
+        # xt.Target('mux', value=tw_sol_off, at='pqc2le.4', tag='mu_end', weight=0.1),
+        # xt.Target('muy', value=tw_sol_off, at='pqc2le.4', tag='mu_end', weight=0.1),
+        # xt.Target('betx', value=tw_sol_off, at='pqc2le.4', tag='bet_end', weight=1),
+        # xt.Target('bety', value=tw_sol_off, at='pqc2le.4', tag='bet_end', weight=10),
+        # xt.Target('alfx', value=tw_sol_off, at='pqc2le.4', tag='alf_end', weight=0.1),
+        # xt.Target('alfy', value=tw_sol_off, at='pqc2le.4', tag='alf_end', weight=0.1),
     ]
 )
+
+prrrr
+
+opt.disable_all_targets()
+opt.disable_all_vary()
+
+# Coupling left side
+opt.enable_targets(tag='coupl_ip')
+opt.enable_vary(tag='skew_l')
 opt.step(25)
+
+opt.enable_targets(tag='mu_ip')
+opt.enable_vary(tag='normal_l')
+opt.step(25)
+
+opt.enable_targets(tag='coupl_ip')
+opt.enable_vary(tag='skew_l')
+opt.step(25)
+
+opt.enable_targets(tag='bet_ip')
+opt.enable_vary(tag='normal_l')
+opt.step(25)
+
+opt.enable_targets(tag='alf_ip')
+opt.enable_vary(tag='normal_l')
+opt.step(25)
+
+
+prrrrr
+
+#
+
+
+# opt.enable_targets(tag='coupl_ip')
+# opt.enable_targets(tag='coupl_end')
+# opt.enable_vary(tag='skew')
+# opt.step(25)
+
+# opt.disable_all_targets()
+# opt.disable_all_vary()
+
+# opt.enable_targets(tag='twiss_ip')
+# opt.enable_vary(tag='normal')
+
+
+
+
+prrrrr
 
 opt_orbit = line.match(
     solve=False,
