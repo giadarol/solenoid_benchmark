@@ -244,19 +244,24 @@ opt_r = line.match(
 
         xt.TargetSet(['x', 'px', 'y', 'py'], value=tw_sol_off, at='ip.1', tag='orbit'),
 
-        xt.TargetRmatrixTerm('r31', start='ip.1', end='pqc2re.1', value=0, tol=1e-8, tag='coupl'),
-        xt.TargetRmatrixTerm('r32', start='ip.1', end='pqc2re.1', value=0, tol=1e-8, tag='coupl'),
-        xt.TargetRmatrixTerm('r41', start='ip.1', end='pqc2re.1', value=0, tol=1e-8, tag='coupl'),
-        xt.TargetRmatrixTerm('r42', start='ip.1', end='pqc2re.1', value=0, tol=1e-8, tag='coupl'),
-        xt.TargetRmatrixTerm('r13', start='ip.1', end='pqc2re.1', value=0, tol=1e-8, tag='coupl'),
-        xt.TargetRmatrixTerm('r14', start='ip.1', end='pqc2re.1', value=0, tol=1e-8, tag='coupl'),
-        xt.TargetRmatrixTerm('r23', start='ip.1', end='pqc2re.1', value=0, tol=1e-8, tag='coupl'),
-        xt.TargetRmatrixTerm('r24', start='ip.1', end='pqc2re.1', value=0, tol=1e-8, tag='coupl'),
+        xt.TargetRmatrix(start='ip.1', end='pqc2re.1',
+                         r31=0, r32=0, r41=0, r42=0, # X-Y block
+                         r13=0, r14=0, r23=0, r24=0, # Y-X block
+                         tol=1e-7, tag='coupl'),
+
+        # xt.TargetRmatrixTerm('r31', start='ip.1', end='pqc2re.1', value=0, tol=1e-8, tag='coupl'),
+        # xt.TargetRmatrixTerm('r32', start='ip.1', end='pqc2re.1', value=0, tol=1e-8, tag='coupl'),
+        # xt.TargetRmatrixTerm('r41', start='ip.1', end='pqc2re.1', value=0, tol=1e-8, tag='coupl'),
+        # xt.TargetRmatrixTerm('r42', start='ip.1', end='pqc2re.1', value=0, tol=1e-8, tag='coupl'),
+        # xt.TargetRmatrixTerm('r13', start='ip.1', end='pqc2re.1', value=0, tol=1e-8, tag='coupl'),
+        # xt.TargetRmatrixTerm('r14', start='ip.1', end='pqc2re.1', value=0, tol=1e-8, tag='coupl'),
+        # xt.TargetRmatrixTerm('r23', start='ip.1', end='pqc2re.1', value=0, tol=1e-8, tag='coupl'),
+        # xt.TargetRmatrixTerm('r24', start='ip.1', end='pqc2re.1', value=0, tol=1e-8, tag='coupl'),
 
         xt.Target('mux', value=tw_sol_off, at='ip.1', tag='mu_ip', weight=0.1, tol=1e-6),
         xt.Target('muy', value=tw_sol_off, at='ip.1', tag='mu_ip', weight=0.1, tol=1e-6),
         xt.Target('betx', value=tw_sol_off, at='ip.1', tag='bet_ip', weight=1, tol=1e-5),
-        xt.Target('bety', value=tw_sol_off, at='ip.1', tag='bet_ip', weight=10, tol=1e-7),
+        xt.Target('bety', value=tw_sol_off, at='ip.1', tag='bet_ip', weight=10, tol=1e-6),
         xt.Target('alfx', value=tw_sol_off, at='ip.1', tag='alf_ip', weight=0.1, tol=1e-4),
         xt.Target('alfy', value=tw_sol_off, at='ip.1', tag='alf_ip', weight=0.1, tol=1e-4),
 
@@ -336,21 +341,6 @@ plt.ylabel(r'$\beta_{y,1}$ [m]')
 
 plt.xlabel('s [m]')
 
-
-plt.figure(4)
-ax1 = plt.subplot(2, 1, 1, sharex=ax1)
-plt.plot(tw_local.s, tw_local.gamx2)
-plt.plot(tw_local_corr.s, tw_local_corr.gamx2)
-plt.plot(tw_local_corr_back.s, tw_local_corr_back.gamx2)
-plt.ylabel(r'$\gamma_{x,2}$ [m]')
-
-ax2 = plt.subplot(2, 1, 2, sharex=ax1)
-plt.plot(tw_local.s, tw_local.gamy1)
-plt.plot(tw_local_corr.s, tw_local_corr.gamy1)
-plt.plot(tw_local_corr_back.s, tw_local_corr_back.gamy1)
-plt.ylabel(r'$\gamma_{y,1}$ [m]')
-
-plt.xlabel('s [m]')
 
 tw_sol_on_corrected = line.twiss(method='4d')
 
