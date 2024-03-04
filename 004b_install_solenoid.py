@@ -148,15 +148,17 @@ line.vars['ks3.l1'] = 0
 line.vars['ks4.l1'] = 0
 
 # line.element_refs['qc1r1.1'].k1s = line.vars['ks1.r1']
+line.element_refs['qc2r1.1'].k1s = line.vars['ks4.r1']
 line.element_refs['qc2r2.1'].k1s = line.vars['ks1.r1']
 line.element_refs['qc1r2.1'].k1s = line.vars['ks2.r1']
 line.element_refs['qc1r3.1'].k1s = line.vars['ks3.r1']
-line.element_refs['qc2r1.1'].k1s = line.vars['ks4.r1']
+
 # line.element_refs['qc1l1.4'].k1s = line.vars['ks1.l1']
+line.element_refs['qc2l1.4'].k1s = line.vars['ks4.l1']
 line.element_refs['qc2l2.4'].k1s = line.vars['ks1.l1']
 line.element_refs['qc1l2.4'].k1s = line.vars['ks2.l1']
 line.element_refs['qc1l3.4'].k1s = line.vars['ks3.l1']
-line.element_refs['qc2l1.4'].k1s = line.vars['ks4.l1']
+
 
 opt = line.match(
     solve=False,
