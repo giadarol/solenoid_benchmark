@@ -244,10 +244,23 @@ opt_r = line.match(
 
         xt.TargetSet(['x', 'px', 'y', 'py'], value=tw_sol_off, at='ip.1', tag='orbit'),
 
-        xt.TargetRmatrix(start='ip.1', end='pqc2re.1',
-                         r31=0, r32=0, r41=0, r42=0, # X-Y block
-                         r13=0, r14=0, r23=0, r24=0, # Y-X block
-                         tol=1e-7, tag='coupl'),
+        # xt.TargetRmatrix(start='ip.1', end='pqc2re.1',
+        #                  r31=0, r32=0, r41=0, r42=0, # X-Y block
+        #                  r13=0, r14=0, r23=0, r24=0, # Y-X block
+        #                  tol=1e-10, tag='coupl'),
+
+        xt.TargetRmatrix(r31=0, r32=0, r41=0, r42=0, # X-Y block,
+                         start='ip.1', end='pqc2re.1', tol=1e-8, tag='coupl'),
+        xt.TargetRmatrix(r13=0, r14=0, r23=0, r24=0, # Y-X block
+                         start='ip.1', end='pqc2re.1', tol=1e-8, tag='coupl'),
+        # xt.TargetRmatrix(r32=0, start='ip.1', end='pqc2re.1', tol=1e-8, tag='coupl'),
+        # xt.TargetRmatrix(r41=0, start='ip.1', end='pqc2re.1', tol=1e-8, tag='coupl'),
+        # xt.TargetRmatrix(r42=0, start='ip.1', end='pqc2re.1', tol=1e-8, tag='coupl'),
+        # xt.TargetRmatrix(r13=0, start='ip.1', end='pqc2re.1', tol=1e-8, tag='coupl'),
+        # xt.TargetRmatrix(r14=0, start='ip.1', end='pqc2re.1', tol=1e-8, tag='coupl'),
+        # xt.TargetRmatrix(r23=0, start='ip.1', end='pqc2re.1', tol=1e-8, tag='coupl'),
+        # xt.TargetRmatrix(r24=0, start='ip.1', end='pqc2re.1', tol=1e-8, tag='coupl'),
+
 
         # xt.TargetRmatrixTerm('r31', start='ip.1', end='pqc2re.1', value=0, tol=1e-8, tag='coupl'),
         # xt.TargetRmatrixTerm('r32', start='ip.1', end='pqc2re.1', value=0, tol=1e-8, tag='coupl'),
@@ -294,7 +307,9 @@ opt_r.step(25)
 opt_r.enable_targets(tag='alf_ip')
 opt_r.step(25)
 
-tw_local_corr = line.twiss(start='ip.4', end='_end_point', init_at='ip.4',
+opt_r.solve() # Just to check
+
+tw_local_corr = line.twiss(start='ip.4', end='_end_point', init_at='ip.1',
                             init=tw_sol_off)
 
 tw_local_corr_back = line.twiss(start='ip.4', end='_end_point', init_at='ip.4',
