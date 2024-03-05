@@ -141,19 +141,24 @@ p_xt = p0.copy()
 line.track(p_xt, turn_by_turn_monitor='ONE_TURN_EBE')
 mon = line.record_last_track
 
+Bz_mid = 0.5 * (Bz_axis[:-1] + Bz_axis[1:])
+Bz_mon = 0 * Bz_axis
+Bz_mon[1:] = Bz_mid
+
 # Wolsky Eq. 3.114
-Ax = -0.5 * Bz_axis * mon.y
-Ay =  0.5 * Bz_axis * mon.x
+Ax = -0.5 * Bz_mon * mon.y
+Ay =  0.5 * Bz_mon * mon.x
 
 # Wolsky Eq. 2.74
-ax = Ax * p0.q0 * qe / P0_J
-ay = Ay * p0.q0 * qe / P0_J
+ax_ref = Ax * p0.q0 * qe / P0_J
+ay_ref = Ay * p0.q0 * qe / P0_J
 
-px_mech = mon.px - ax
-py_mech = mon.py - ay
+px_mech = mon.px - ax_ref
+py_mech = mon.py - ay_ref
+pz_mech = np.sqrt((1 + mon.delta)**2 - px_mech**2 - py_mech**2)
 
-xp = px_mech / (1 + mon.delta)
-yp = py_mech / (1 + mon.delta)
+xp = px_mech / pz_mech
+yp = py_mech / pz_mech
 
 dx_ds = np.diff(mon.x, axis=1) / np.diff(mon.s, axis=1)
 
@@ -178,5 +183,11 @@ plt.plot(mon.s[:, :-1].T, dx_ds.T, '.', label=r"$\Delta x / \Delta s$", color='C
 plt.plot(mon.s.T, mon.px.T, '--', label=r"$p_x$", color='C2')
 plt.legend()
 
+# Compare ax and ay
+plt.figure(3)
+plt.plot(mon.s.T, ax_ref.T, label="ax_ref", color='C0', linestyle='-')
+plt.plot(mon.s.T, ay_ref.T, label="ay_ref", color='C1', linestyle='-')
+plt.plot(mon.s.T, mon.ax.T, label="ax", color='C2', linestyle='--')
+plt.plot(mon.s.T, mon.ay.T, label="ay", color='C3', linestyle='--')
 
 plt.show()
