@@ -181,14 +181,10 @@ opt_l = line.match(
 
         xt.TargetSet(['x', 'px', 'y', 'py'], value=tw_sol_off, at='ip.1', tag='orbit'),
 
-        xt.TargetRmatrixTerm('r31', start='pqc2le.4', end='ip.1', value=0, tol=1e-8, tag='coupl'),
-        xt.TargetRmatrixTerm('r32', start='pqc2le.4', end='ip.1', value=0, tol=1e-8, tag='coupl'),
-        xt.TargetRmatrixTerm('r41', start='pqc2le.4', end='ip.1', value=0, tol=1e-8, tag='coupl'),
-        xt.TargetRmatrixTerm('r42', start='pqc2le.4', end='ip.1', value=0, tol=1e-8, tag='coupl'),
-        xt.TargetRmatrixTerm('r13', start='pqc2le.4', end='ip.1', value=0, tol=1e-8, tag='coupl'),
-        xt.TargetRmatrixTerm('r14', start='pqc2le.4', end='ip.1', value=0, tol=1e-8, tag='coupl'),
-        xt.TargetRmatrixTerm('r23', start='pqc2le.4', end='ip.1', value=0, tol=1e-8, tag='coupl'),
-        xt.TargetRmatrixTerm('r24', start='pqc2le.4', end='ip.1', value=0, tol=1e-8, tag='coupl'),
+        xt.TargetRmatrix(
+                    r13=0, r14=0, r23=0, r24=0, # Y-X block
+                    r31=0, r32=0, r41=0, r42=0, # X-Y block,
+                    start='pqc2le.4', end='ip.1', tol=1e-8, tag='coupl'),
 
         xt.Target('mux', value=tw_sol_off, at='ip.1', tag='mu_ip', weight=0.1, tol=1e-6),
         xt.Target('muy', value=tw_sol_off, at='ip.1', tag='mu_ip', weight=0.1, tol=1e-6),
@@ -200,33 +196,37 @@ opt_l = line.match(
     ]
 )
 
-opt_l.disable_all_targets()
-opt_l.disable_all_vary()
-opt_l.enable_targets(tag='orbit')
-opt_l.enable_vary(tag='corr_l')
-opt_l.step(25)
+# Orbit alone
+opt_l.disable_all_targets(); opt_l.disable_all_vary()
+opt_l.enable_targets(tag='orbit'); opt_l.enable_vary(tag='corr_l')
+opt_l.solve()
 
-opt_l.disable_all_targets()
-opt_l.disable_all_vary()
-opt_l.enable_targets(tag='coupl')
-opt_l.enable_vary(tag='skew_l')
-opt_l.step(25)
+# Coupling alone
+opt_l.disable_all_targets(); opt_l.disable_all_vary()
+opt_l.enable_targets(tag='coupl'); opt_l.enable_vary(tag='skew_l')
+opt_l.solve()
 
-opt_l.enable_targets(tag='orbit')
-opt_l.enable_vary(tag='corr_l')
-opt_l.step(25)
+# Orbit and coupling
+opt_l.enable_targets(tag='orbit'); opt_l.enable_vary(tag='corr_l')
+opt_l.solve()
 
-opt_l.enable_targets(tag='mu_ip')
-opt_l.enable_vary(tag='normal_l')
-opt_l.step(25)
+# Phase advance alone
+opt_l.disable_all_targets(); opt_l.disable_all_vary()
+opt_l.enable_targets(tag='mu_ip'); opt_l.enable_vary(tag='normal_l')
+opt_l.solve()
 
+# Combine phase, coupling and orbit
+opt_l.enable_targets(tag='coupl'); opt_l.enable_vary(tag='skew_l')
+opt_l.enable_targets(tag='orbit'); opt_l.enable_vary(tag='corr_l')
+opt_l.solve()
+
+# Add targets on ip beta
 opt_l.enable_targets(tag='bet_ip')
-opt_l.step(25)
+opt_l.solve()
 
+# Add targets on ip alfa (--> all targets active)
 opt_l.enable_targets(tag='alf_ip')
-opt_l.step(25)
-
-
+opt_l.solve()
 
 opt_r = line.match(
     solve=False,
@@ -244,32 +244,9 @@ opt_r = line.match(
 
         xt.TargetSet(['x', 'px', 'y', 'py'], value=tw_sol_off, at='ip.1', tag='orbit'),
 
-        # xt.TargetRmatrix(start='ip.1', end='pqc2re.1',
-        #                  r31=0, r32=0, r41=0, r42=0, # X-Y block
-        #                  r13=0, r14=0, r23=0, r24=0, # Y-X block
-        #                  tol=1e-10, tag='coupl'),
-
-        xt.TargetRmatrix(r31=0, r32=0, r41=0, r42=0, # X-Y block,
-                         start='ip.1', end='pqc2re.1', tol=1e-8, tag='coupl'),
         xt.TargetRmatrix(r13=0, r14=0, r23=0, r24=0, # Y-X block
+                         r31=0, r32=0, r41=0, r42=0, # X-Y block,
                          start='ip.1', end='pqc2re.1', tol=1e-8, tag='coupl'),
-        # xt.TargetRmatrix(r32=0, start='ip.1', end='pqc2re.1', tol=1e-8, tag='coupl'),
-        # xt.TargetRmatrix(r41=0, start='ip.1', end='pqc2re.1', tol=1e-8, tag='coupl'),
-        # xt.TargetRmatrix(r42=0, start='ip.1', end='pqc2re.1', tol=1e-8, tag='coupl'),
-        # xt.TargetRmatrix(r13=0, start='ip.1', end='pqc2re.1', tol=1e-8, tag='coupl'),
-        # xt.TargetRmatrix(r14=0, start='ip.1', end='pqc2re.1', tol=1e-8, tag='coupl'),
-        # xt.TargetRmatrix(r23=0, start='ip.1', end='pqc2re.1', tol=1e-8, tag='coupl'),
-        # xt.TargetRmatrix(r24=0, start='ip.1', end='pqc2re.1', tol=1e-8, tag='coupl'),
-
-
-        # xt.TargetRmatrixTerm('r31', start='ip.1', end='pqc2re.1', value=0, tol=1e-8, tag='coupl'),
-        # xt.TargetRmatrixTerm('r32', start='ip.1', end='pqc2re.1', value=0, tol=1e-8, tag='coupl'),
-        # xt.TargetRmatrixTerm('r41', start='ip.1', end='pqc2re.1', value=0, tol=1e-8, tag='coupl'),
-        # xt.TargetRmatrixTerm('r42', start='ip.1', end='pqc2re.1', value=0, tol=1e-8, tag='coupl'),
-        # xt.TargetRmatrixTerm('r13', start='ip.1', end='pqc2re.1', value=0, tol=1e-8, tag='coupl'),
-        # xt.TargetRmatrixTerm('r14', start='ip.1', end='pqc2re.1', value=0, tol=1e-8, tag='coupl'),
-        # xt.TargetRmatrixTerm('r23', start='ip.1', end='pqc2re.1', value=0, tol=1e-8, tag='coupl'),
-        # xt.TargetRmatrixTerm('r24', start='ip.1', end='pqc2re.1', value=0, tol=1e-8, tag='coupl'),
 
         xt.Target('mux', value=tw_sol_off, at='ip.1', tag='mu_ip', weight=0.1, tol=1e-6),
         xt.Target('muy', value=tw_sol_off, at='ip.1', tag='mu_ip', weight=0.1, tol=1e-6),
@@ -281,33 +258,37 @@ opt_r = line.match(
     ]
 )
 
-opt_r.disable_all_targets()
-opt_r.disable_all_vary()
-opt_r.enable_targets(tag='orbit')
-opt_r.enable_vary(tag='corr_r')
-opt_r.step(25)
+# Orbit alone
+opt_r.disable_all_targets(); opt_r.disable_all_vary()
+opt_r.enable_targets(tag='orbit'); opt_r.enable_vary(tag='corr_r')
+opt_r.solve()
 
-opt_r.disable_all_targets()
-opt_r.disable_all_vary()
-opt_r.enable_targets(tag='coupl')
-opt_r.enable_vary(tag='skew_r')
-opt_r.step(25)
+# Coupling alone
+opt_r.disable_all_targets(); opt_r.disable_all_vary()
+opt_r.enable_targets(tag='coupl'); opt_r.enable_vary(tag='skew_r')
+opt_r.solve()
 
-opt_r.enable_targets(tag='orbit')
-opt_r.enable_vary(tag='corr_r')
-opt_r.step(25)
+# Orbit and coupling
+opt_r.enable_targets(tag='orbit'); opt_r.enable_vary(tag='corr_r')
+opt_r.solve()
 
-opt_r.enable_targets(tag='mu_ip')
-opt_r.enable_vary(tag='normal_r')
-opt_r.step(25)
+# Phase advance alone
+opt_r.disable_all_targets(); opt_r.disable_all_vary()
+opt_r.enable_targets(tag='mu_ip'); opt_r.enable_vary(tag='normal_r')
+opt_r.solve()
 
+# Combine phase, coupling and orbit
+opt_r.enable_targets(tag='coupl'); opt_r.enable_vary(tag='skew_r')
+opt_r.enable_targets(tag='orbit'); opt_r.enable_vary(tag='corr_r')
+opt_r.solve()
+
+# Add targets on ip beta
 opt_r.enable_targets(tag='bet_ip')
-opt_r.step(25)
+opt_r.solve()
 
+# Add targets on ip alfa (--> all targets active)
 opt_r.enable_targets(tag='alf_ip')
-opt_r.step(25)
-
-opt_r.solve() # Just to check
+opt_r.solve()
 
 tw_local_corr = line.twiss(start='ip.4', end='_end_point', init_at='ip.1',
                             init=tw_sol_off)
