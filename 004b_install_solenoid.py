@@ -21,7 +21,7 @@ ip_sol = 'ip.1'
 
 theta_tilt = 15e-3 # rad
 
-s_sol_slices = np.linspace(-2.2, 2.2, 1001)
+s_sol_slices = np.linspace(-2.2, 2.2, 81)
 bz_sol_slices = np.interp(s_sol_slices, bz_df.z, bz_df.Bz)
 
 P0_J = line.particle_ref.p0c[0] * qe / clight
@@ -215,11 +215,6 @@ opt_l.disable_all_targets(); opt_l.disable_all_vary()
 opt_l.enable_targets(tag='mu_ip'); opt_l.enable_vary(tag='normal_l')
 opt_l.solve()
 
-# Coupling alone
-opt_l.disable_all_targets(); opt_l.disable_all_vary()
-opt_l.enable_targets(tag='coupl'); opt_l.enable_vary(tag='skew_l')
-opt_l.step(25)
-
 # Combine phase, coupling and orbit
 opt_l.enable_targets(tag='coupl'); opt_l.enable_vary(tag='skew_l')
 opt_l.enable_targets(tag='orbit'); opt_l.enable_vary(tag='corr_l')
@@ -271,7 +266,7 @@ opt_r.solve()
 # Coupling alone
 opt_r.disable_all_targets(); opt_r.disable_all_vary()
 opt_r.enable_targets(tag='coupl'); opt_r.enable_vary(tag='skew_r')
-opt_r.step(25)
+opt_r.solve()
 
 # Orbit and coupling
 opt_r.enable_targets(tag='orbit'); opt_r.enable_vary(tag='corr_r')
@@ -281,11 +276,6 @@ opt_r.solve()
 opt_r.disable_all_targets(); opt_r.disable_all_vary()
 opt_r.enable_targets(tag='mu_ip'); opt_r.enable_vary(tag='normal_r')
 opt_r.solve()
-
-# Coupling alone
-opt_r.disable_all_targets(); opt_r.disable_all_vary()
-opt_r.enable_targets(tag='coupl'); opt_r.enable_vary(tag='skew_r')
-opt_r.step(25)
 
 # Combine phase, coupling and orbit
 opt_r.enable_targets(tag='coupl'); opt_r.enable_vary(tag='skew_r')
@@ -307,7 +297,6 @@ tw_local_corr_back = line.twiss(start='ip.4', end='_end_point', init_at='ip.4',
                                 init=tw_local_corr)
 
 
-line.to_json('fccee_z_thick_with_sol_corrected.json')
 
 
 # plot

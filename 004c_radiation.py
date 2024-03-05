@@ -25,6 +25,8 @@ dE_ds[mask_ds] = -eloss[mask_ds] / ds[mask_ds]
 import matplotlib.pyplot as plt
 plt.close('all')
 plt.figure(1)
-plt.plot(tw.s[:-1], dE_ds, label='dE/ds')
+plt.plot(tw.s[:-1], dE_ds * 1e-2 * 1e-3, label='dE/ds')
+plt.xlabel('s [m]')
+plt.ylabel('dE/ds [keV/m]')
 
 plt.show()
