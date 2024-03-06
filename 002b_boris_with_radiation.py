@@ -61,9 +61,10 @@ y_log = []
 z_log = []
 px_log = []
 py_log = []
-pz_log = []
+pp_log = []
 pow_log = []
-
+pow_x_log = []
+pow_y_log = []
 
 for ii in range(n_steps):
 
@@ -118,6 +119,8 @@ for ii in range(n_steps):
     p.s = z
     p.px = mass0_kg * gamma * vx * clight / p0c_J
     p.py = mass0_kg * gamma * vy * clight / p0c_J
+    pz = mass0_kg * gamma * vz * clight / p0c_J
+    pp = np.sqrt(p.px**2 + p.py**2 + pz**2)
 
     beta_x_before = vx_before / clight
     beta_y_before = vy_before / clight
@@ -138,6 +141,7 @@ for ii in range(n_steps):
     z_log.append(p.s.copy())
     px_log.append(p.px.copy())
     py_log.append(p.py.copy())
+    pp_log.append(pp)
     pow_log.append(pow)
 
 x_log = np.array(x_log)
@@ -145,11 +149,14 @@ y_log = np.array(y_log)
 z_log = np.array(z_log)
 px_log = np.array(px_log)
 py_log = np.array(py_log)
+pp_log = np.array(pp_log)
+
 pow_log = np.array(pow_log)
 
-dE_ds_boris = 0 * pow_log
+dE_ds_boris_J = 0 * pow_log
 
-dE_ds_boris[:-1]= pow_log[:-1] * dt / np.diff(z_log, axis=0)
+dE_ds_boris_J[:-1]= pow_log[:-1] * dt / np.diff(z_log, axis=0)
+dE_ds_boris_eV = dE_ds_boris_J / qe
 
 z_axis = np.linspace(0, 30, 1001)
 Bz_axis = sf.get_field(0 * z_axis, 0 * z_axis, z_axis)[2]
@@ -226,9 +233,18 @@ dE_ds = -np.diff(mon.ptau, axis=1)/np.diff(mon.s, axis=1) * p_xt.energy0[0]
 
 plt.figure(4)
 plt.plot(mon.s[:, :-1].T, dE_ds.T * 1e-2 * 1e-3, '.-', label='dE/ds')
-plt.plot(mon.s[:, :-1].T, dE_ds_boris/qe * 1e-2 * 1e-3, 'x-', label='dE/ds Boris')
+plt.plot(mon.s[:, :-1].T, dE_ds_boris_eV * 1e-2 * 1e-3, 'x-', label='dE/ds Boris')
 
 plt.figure(5)
-plt.plot(np.diff(mon.px, axis=1).T - np.diff(mon_no_rad.px, axis=1).T)
+emitted_dpx = np.diff(mon.px, axis=1) - np.diff(mon_no_rad.px, axis=1)
+emitted_dpy = np.diff(mon.py, axis=1) - np.diff(mon_no_rad.py, axis=1)
+emitted_dp = np.diff(mon.delta, axis=1) - np.diff(mon_no_rad.delta, axis=1)
+
+plt.plot(mon.s[:, :-1].T, emitted_dpx.T, '-', label='dpx')
+plt.plot(mon.s[:, :-1].T, dE_ds.T * dx_ds.T*np.diff(mon.s, 1).T/p.p0c[0], '--')
+# plt.plot(mon.s[:, :-1].T, emitted_dpy.T, ':', label='dpx')
+# plt.plot(mon.s[:, :-1].T, emitted_dp.T, '--', label='dp')
+
+# plt.plot(mon.s[:, :-1].T, px_log/pp_log, '--', label='dpx boris')
 
 plt.show()
