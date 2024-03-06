@@ -236,14 +236,17 @@ plt.plot(mon.s[:, :-1].T, dE_ds.T * 1e-2 * 1e-3, '.-', label='dE/ds')
 plt.plot(mon.s[:, :-1].T, dE_ds_boris_eV * 1e-2 * 1e-3, 'x-', label='dE/ds Boris')
 
 plt.figure(5)
-emitted_dpx = np.diff(mon.px, axis=1) - np.diff(mon_no_rad.px, axis=1)
-emitted_dpy = np.diff(mon.py, axis=1) - np.diff(mon_no_rad.py, axis=1)
-emitted_dp = np.diff(mon.delta, axis=1) - np.diff(mon_no_rad.delta, axis=1)
+emitted_dpx = -(np.diff(mon.px, axis=1) - np.diff(mon_no_rad.px, axis=1))
+emitted_dpy = -(np.diff(mon.py, axis=1) - np.diff(mon_no_rad.py, axis=1))
+emitted_dp = -(np.diff(mon.delta, axis=1) - np.diff(mon_no_rad.delta, axis=1))
 
 plt.plot(mon.s[:, :-1].T, emitted_dpx.T, '-', label='dpx')
 plt.plot(mon.s[:, :-1].T, dE_ds.T * dx_ds.T*np.diff(mon.s, 1).T/p.p0c[0], '--')
 # plt.plot(mon.s[:, :-1].T, emitted_dpy.T, ':', label='dpx')
 # plt.plot(mon.s[:, :-1].T, emitted_dp.T, '--', label='dp')
+
+# plt.plot(mon.s[:, :-1].T, emitted_dp.T, '-', label='dpx')
+# plt.plot(mon.s[:, :-1].T, dE_ds.T *np.diff(mon.s, 1).T/p.p0c[0], '--')
 
 # plt.plot(mon.s[:, :-1].T, px_log/pp_log, '--', label='dpx boris')
 
