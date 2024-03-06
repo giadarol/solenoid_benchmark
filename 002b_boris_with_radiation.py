@@ -3,6 +3,7 @@ from pathlib import Path
 
 from scipy.constants import c as clight
 from scipy.constants import e as qe
+from scipy.constants import epsilon_0 as eps0
 
 from solenoid_field import SolenoidField
 
@@ -59,6 +60,7 @@ z_log = []
 px_log = []
 py_log = []
 pz_log = []
+pow_log = []
 
 
 for ii in range(n_steps):
@@ -82,6 +84,9 @@ for ii in range(n_steps):
     vx = Pxc_J / clight / (gamma * mass0_kg) # m/s
     vy = Pyc_J / clight / (gamma * mass0_kg) # m/s
     vz = Pzc_J / clight / (gamma * mass0_kg) # m/s
+
+    vx_before = vx.copy()
+    vy_before = vy.copy()
 
     ctx.kernels.boris(
             N_sub_steps=1,
@@ -112,17 +117,37 @@ for ii in range(n_steps):
     p.px = mass0_kg * gamma * vx * clight / p0c_J
     p.py = mass0_kg * gamma * vy * clight / p0c_J
 
+    beta_x_before = vx_before / clight
+    beta_y_before = vy_before / clight
+
+    beta_x_after = vx / clight
+    beta_y_after = vy / clight
+
+    beta_x_dot = (beta_x_after - beta_x_before) / dt
+    beta_y_dot = (beta_y_after - beta_y_before) / dt
+
+    bet_dot_square = np.sum(beta_x_dot**2 + beta_y_dot**2)
+
+    # From Hofmann, "The physics of synchrontron radiation" Eq 3.7 and below
+    pow = 2 * qe**2 * bet_dot_square * gamma**4 / (12 * np.pi * eps0 * clight)
+
     x_log.append(p.x.copy())
     y_log.append(p.y.copy())
     z_log.append(p.s.copy())
     px_log.append(p.px.copy())
     py_log.append(p.py.copy())
+    pow_log.append(pow)
 
 x_log = np.array(x_log)
 y_log = np.array(y_log)
 z_log = np.array(z_log)
 px_log = np.array(px_log)
 py_log = np.array(py_log)
+pow_log = np.array(pow_log)
+
+dE_ds_boris = 0 * pow_log
+
+dE_ds_boris[:-1]= pow_log[:-1] * dt / np.diff(z_log, axis=0)
 
 z_axis = np.linspace(0, 30, 1001)
 Bz_axis = sf.get_field(0 * z_axis, 0 * z_axis, z_axis)[2]
@@ -193,6 +218,7 @@ plt.plot(mon.s.T, mon.ay.T, label="ay", color='C3', linestyle='--')
 dE_ds = -np.diff(mon.ptau, axis=1)/np.diff(mon.s, axis=1) * p_xt.energy0[0]
 
 plt.figure(4)
-plt.plot(mon.s[:, :-1].T, dE_ds.T * 1e-2 * 1e-3, '.-', label='dE/ds')
+plt.plot(mon.s[:, :-1].T, 2*dE_ds.T * 1e-2 * 1e-3, '.-', label='dE/ds')
+plt.plot(mon.s[:, :-1].T, dE_ds_boris/qe * 1e-2 * 1e-3, 'x-', label='dE/ds Boris')
 
 plt.show()
