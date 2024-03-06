@@ -43,10 +43,11 @@ ctx.add_kernels(
     sources=[Path('./boris.h')],
 )
 
+delta=np.array([0, 4])
 p0 = xt.Particles(mass0=xt.ELECTRON_MASS_EV, q0=1,
                  energy0=45.6e9,
-                 x=[-1e-3, 1e-3], px=[1e-6, -1e-6], py=[2e-3, -2e-3],
-                 delta=[0, -0.9])
+                 x=[-1e-3, -1e-3], px=-1e-3*(1+delta), py=[0, 0],
+                 delta=delta)
 
 p = p0.copy()
 
