@@ -168,6 +168,11 @@ p_xt = p0.copy()
 line.track(p_xt, turn_by_turn_monitor='ONE_TURN_EBE')
 mon = line.record_last_track
 
+p_xt = p0.copy()
+line.configure_radiation(model=None)
+line.track(p_xt, turn_by_turn_monitor='ONE_TURN_EBE')
+mon_no_rad = line.record_last_track
+
 Bz_mid = 0.5 * (Bz_axis[:-1] + Bz_axis[1:])
 Bz_mon = 0 * Bz_axis
 Bz_mon[1:] = Bz_mid
@@ -222,5 +227,8 @@ dE_ds = -np.diff(mon.ptau, axis=1)/np.diff(mon.s, axis=1) * p_xt.energy0[0]
 plt.figure(4)
 plt.plot(mon.s[:, :-1].T, dE_ds.T * 1e-2 * 1e-3, '.-', label='dE/ds')
 plt.plot(mon.s[:, :-1].T, dE_ds_boris/qe * 1e-2 * 1e-3, 'x-', label='dE/ds Boris')
+
+plt.figure(5)
+plt.plot(np.diff(mon.px, axis=1).T - np.diff(mon_no_rad.px, axis=1).T)
 
 plt.show()
