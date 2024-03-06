@@ -126,7 +126,7 @@ for ii in range(n_steps):
     beta_x_dot = (beta_x_after - beta_x_before) / dt
     beta_y_dot = (beta_y_after - beta_y_before) / dt
 
-    bet_dot_square = np.sum(beta_x_dot**2 + beta_y_dot**2)
+    bet_dot_square = beta_x_dot**2 + beta_y_dot**2
 
     # From Hofmann, "The physics of synchrontron radiation" Eq 3.7 and below
     pow = 2 * qe**2 * bet_dot_square * gamma**4 / (12 * np.pi * eps0 * clight)
@@ -218,7 +218,7 @@ plt.plot(mon.s.T, mon.ay.T, label="ay", color='C3', linestyle='--')
 dE_ds = -np.diff(mon.ptau, axis=1)/np.diff(mon.s, axis=1) * p_xt.energy0[0]
 
 plt.figure(4)
-plt.plot(mon.s[:, :-1].T, 2*dE_ds.T * 1e-2 * 1e-3, '.-', label='dE/ds')
+plt.plot(mon.s[:, :-1].T, dE_ds.T * 1e-2 * 1e-3, '.-', label='dE/ds')
 plt.plot(mon.s[:, :-1].T, dE_ds_boris/qe * 1e-2 * 1e-3, 'x-', label='dE/ds Boris')
 
 plt.show()
