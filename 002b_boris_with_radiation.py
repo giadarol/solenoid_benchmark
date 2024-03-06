@@ -45,7 +45,8 @@ ctx.add_kernels(
 
 p0 = xt.Particles(mass0=xt.ELECTRON_MASS_EV, q0=1,
                  energy0=45.6e9,
-                 x=[-1e-3, 1e-3], px=[1e-6, -1e-6], py=[2e-3, -2e-3])
+                 x=[-1e-3, 1e-3], px=[1e-6, -1e-6], py=[2e-3, -2e-3],
+                 delta=[0, -0.9])
 
 p = p0.copy()
 
@@ -79,7 +80,7 @@ for ii in range(n_steps):
 
     Pxc_J = p.px * p0c_J
     Pyc_J = p.py * p0c_J
-    Pzc_J = np.sqrt((p0c_J)**2 - Pxc_J**2 - Pyc_J**2)
+    Pzc_J = np.sqrt((p0c_J*(1 + p.delta))**2 - Pxc_J**2 - Pyc_J**2)
 
     vx = Pxc_J / clight / (gamma * mass0_kg) # m/s
     vy = Pyc_J / clight / (gamma * mass0_kg) # m/s
